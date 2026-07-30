@@ -5,7 +5,8 @@ import Button from "./Button";
 
 export default function ContactForm() {
   const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", country: "", message: "" });
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [errorMsg, setErrorMsg] = useState("");
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const inputStyle = {
@@ -14,7 +15,29 @@ export default function ContactForm() {
     color: COLORS.darkGray, background: COLORS.white, transition: "border-color 0.15s",
   };
 
-  if (sent) {
+  const handleSubmit = async () => {
+    if (!form.name || !form.email || !form.message) {
+      setErrorMsg("Please fill in your name, email and inquiry.");
+      setStatus("error");
+      return;
+    }
+    setStatus("sending");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setStatus("sent");
+    } catch {
+      setErrorMsg("Something went wrong sending your request. Please try again or email us directly.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "sent") {
     return (
       <div style={{ background: COLORS.lightGray, borderRadius: 4, padding: "48px 32px", textAlign: "center" }}>
         <Icon type="check" size={40} color={COLORS.orange} />
@@ -61,9 +84,13 @@ export default function ContactForm() {
           placeholder="Describe the products you need: type, specifications, quantity, delivery destination..."
           onFocus={e => e.target.style.borderColor = COLORS.navy} onBlur={e => e.target.style.borderColor = COLORS.borderGray} />
       </div>
-      <Button variant="primary" style={{ width: "100%", justifyContent: "center", marginTop: 4 }}
-        onClick={() => { if (form.name && form.email && form.message) setSent(true); }}>
-        Submit Inquiry
+      {status === "error" && errorMsg && (
+        <div style={{ fontSize: 13, color: "#C0392B" }}>{errorMsg}</div>
+      )}
+      <Button variant="primary" style={{ width: "100%", justifyContent: "center", marginTop: 4, opacity: status === "sending" ? 0.7 : 1, cursor: status === "sending" ? "default" : "pointer" }}
+        disabled={status === "sending"}
+        onClick={handleSubmit}>
+        {status === "sending" ? "Sending..." : "Submit Inquiry"}
       </Button>
     </div>
   );
