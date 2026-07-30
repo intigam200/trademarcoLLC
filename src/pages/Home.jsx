@@ -47,7 +47,7 @@ export default function Home() {
               We source industrial equipment and components from qualified manufacturers worldwide — with competitive pricing, quality control, and reliable supply support.
             </p>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 56 }}>
-              <Button as="a" href="#contact" variant="primary">
+              <Button as="a" href="#contact" variant="primary" style={{ padding: "16px 32px", fontSize: 18, fontWeight: 600 }}>
                 Request a Quote <Icon type="arrow-right" size={18} color={COLORS.white} />
               </Button>
               <Button as="a" href="#products" variant="secondary">
@@ -55,9 +55,12 @@ export default function Home() {
               </Button>
             </div>
 
-            <div className="tm-hero-trust" style={{ display: "flex", gap: 40, borderTop: "1px solid rgba(255,255,255,0.14)", paddingTop: 28, maxWidth: 620 }}>
+            <div className="tm-hero-trust" style={{ display: "flex", gap: 16, maxWidth: 640 }}>
               {HERO_TRUST.map((t) => (
-                <div key={t.title}>
+                <div key={t.title} style={{
+                  background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
+                  borderRadius: 8, padding: 16, flex: 1,
+                }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.orange, marginBottom: 6 }}>
                     {t.title}
                   </div>
@@ -86,8 +89,10 @@ export default function Home() {
               background: linear-gradient(180deg, rgba(15,25,45,0.4) 0%, rgba(15,25,45,0.88) 55%, ${COLORS.navy} 100%) !important;
             }
             .tm-hero-trust {
-              gap: 24px !important;
               flex-wrap: wrap;
+            }
+            .tm-hero-trust > div {
+              min-width: 45%;
             }
           }
         `}</style>
@@ -101,7 +106,9 @@ export default function Home() {
         }}>
           {BENEFIT_ITEMS.map((b, i) => (
             <div key={i} className="tm-benefit-item tm-hover-icon" style={{ padding: "32px 28px" }}>
-              <Icon type={b.icon} size={40} color={COLORS.orange} />
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: COLORS.iconBlueBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon type={b.icon} size={24} color={COLORS.iconBlue} />
+              </div>
               <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, margin: "14px 0 6px" }}>{b.title}</h4>
               <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: 0 }}>{b.desc}</p>
             </div>
@@ -129,28 +136,34 @@ export default function Home() {
         <SectionDesc>
           From standard commodities to hard-to-find specialty items — we cover the full range of industrial equipment and components.
         </SectionDesc>
-        <div style={{
+        <div className="tm-products-grid" style={{
           display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 20, marginTop: 48,
         }}>
           {PRODUCTS.map((p) => (
-            <Link key={p.slug} to={`/products?category=${p.slug}`} className="tm-hover-icon" style={{
-              display: "block", background: COLORS.white, border: `1px solid ${COLORS.borderGray}`, borderRadius: 8,
-              overflow: "hidden", transition: "box-shadow 0.15s", textDecoration: "none",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 20px rgba(27,42,74,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
-            >
-              <div style={{ height: 160, padding: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Link key={p.slug} to={`/products?category=${p.slug}`} className="tm-hover-icon tm-product-card" style={{
+              display: "flex", flexDirection: "column", height: "100%",
+              background: COLORS.white, border: `1px solid ${COLORS.borderGray}`, borderRadius: 8,
+              overflow: "hidden", textDecoration: "none",
+            }}>
+              <div style={{ height: 160, padding: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <img src={p.image} alt={p.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               </div>
-              <div style={{ padding: "0 20px 20px" }}>
+              <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>{p.title}</h3>
-                <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: "0 0 14px" }}>{p.desc}</p>
+                <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: "0 0 14px", flexGrow: 1 }}>{p.desc}</p>
                 <Icon type="arrow-right" size={18} color={COLORS.orange} />
               </div>
             </Link>
           ))}
         </div>
+
+        <style>{`
+          .tm-product-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+          .tm-product-card:hover { box-shadow: 0 10px 25px rgba(27,42,74,0.12); transform: translateY(-4px); }
+          @media (max-width: 640px) {
+            .tm-products-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          }
+        `}</style>
       </Section>
 
       {/* ── INDUSTRIES ── */}
@@ -308,7 +321,7 @@ export default function Home() {
         }}>
           {REGIONS.map((r, i) => (
             <div key={i} style={{ padding: "32px 24px", background: "rgba(255,255,255,0.03)", textAlign: "center" }}>
-              <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}><Icon type="globe" size={28} color="rgba(255,255,255,0.4)" /></div>
+              <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}><Icon type={r.icon} size={28} color="rgba(255,255,255,0.4)" /></div>
               <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.white }}>{r.region}</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 6 }}>{r.detail}</div>
             </div>
@@ -419,7 +432,16 @@ export default function Home() {
               {CONTACT_INFO.map((c, i) => (
                 <div key={i}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.navy, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>{c.label}</div>
-                  <div style={{ fontSize: 15, color: COLORS.medGray }}>{c.value}</div>
+                  {c.href ? (
+                    <a href={c.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: COLORS.medGray, textDecoration: "none" }}
+                      onMouseEnter={e => e.currentTarget.style.color = COLORS.orange}
+                      onMouseLeave={e => e.currentTarget.style.color = COLORS.medGray}>
+                      {c.icon && <Icon type={c.icon} size={16} color="currentColor" />}
+                      {c.value}
+                    </a>
+                  ) : (
+                    <div style={{ fontSize: 15, color: COLORS.medGray }}>{c.value}</div>
+                  )}
                 </div>
               ))}
             </div>

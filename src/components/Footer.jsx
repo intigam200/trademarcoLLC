@@ -18,10 +18,7 @@ const CONTACT_ROWS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: "linkedin", label: "LinkedIn" },
-  { icon: "facebook", label: "Facebook" },
-  { icon: "instagram", label: "Instagram" },
-  { icon: "youtube", label: "YouTube" },
+  { icon: "linkedin", label: "LinkedIn", href: "https://linkedin.com/company/trademarco" },
 ];
 
 function FooterHeading({ children }) {
@@ -80,7 +77,7 @@ export default function Footer() {
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 26 }}>
               {SOCIAL_LINKS.map((s) => (
-                <a key={s.label} href="#" aria-label={s.label} className="tm-footer-social" style={{
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} className="tm-footer-social" style={{
                   width: 34, height: 34, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.18)",
                   display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
                 }}>

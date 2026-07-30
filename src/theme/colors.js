@@ -9,4 +9,6 @@ export const COLORS = {
   lightGray: "#F4F5F7",
   borderGray: "#E0E2E6",
   offWhite: "#FAFBFC",
+  iconBlue: "#3b82f6",
+  iconBlueBg: "#EFF6FF",
 };

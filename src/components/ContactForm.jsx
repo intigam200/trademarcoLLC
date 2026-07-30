@@ -4,7 +4,7 @@ import Icon from "./Icon";
 import Button from "./Button";
 
 export default function ContactForm() {
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", country: "", message: "" });
   const [sent, setSent] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -42,6 +42,18 @@ export default function ContactForm() {
         <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy, display: "block", marginBottom: 6 }}>Company</label>
         <input style={inputStyle} value={form.company} onChange={set("company")} placeholder="Company name"
           onFocus={e => e.target.style.borderColor = COLORS.navy} onBlur={e => e.target.style.borderColor = COLORS.borderGray} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div>
+          <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy, display: "block", marginBottom: 6 }}>Phone Number <span style={{ fontWeight: 400, color: COLORS.medGray, textTransform: "none", letterSpacing: 0 }}>(optional)</span></label>
+          <input style={inputStyle} type="tel" value={form.phone} onChange={set("phone")} placeholder="+1 (XXX) XXX-XXXX"
+            onFocus={e => e.target.style.borderColor = COLORS.navy} onBlur={e => e.target.style.borderColor = COLORS.borderGray} />
+        </div>
+        <div>
+          <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy, display: "block", marginBottom: 6 }}>Country / Delivery Destination</label>
+          <input style={inputStyle} value={form.country} onChange={set("country")} placeholder="e.g. Saudi Arabia, Houston TX"
+            onFocus={e => e.target.style.borderColor = COLORS.navy} onBlur={e => e.target.style.borderColor = COLORS.borderGray} />
+        </div>
       </div>
       <div>
         <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy, display: "block", marginBottom: 6 }}>Your Inquiry</label>

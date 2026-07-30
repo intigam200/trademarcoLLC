@@ -88,10 +88,10 @@ export const HERO_TRUST = [
 ];
 
 export const REGIONS = [
-  { region: "North America", detail: "USA, Canada, Mexico" },
-  { region: "Europe", detail: "Germany, Italy, UK, Spain" },
-  { region: "Middle East", detail: "UAE, Saudi Arabia, Turkey" },
-  { region: "Asia-Pacific", detail: "China, India, South Korea, Japan" },
+  { region: "North America", detail: "USA, Canada, Mexico", icon: "earth-americas" },
+  { region: "Europe", detail: "Germany, Italy, UK, Spain", icon: "earth-europe" },
+  { region: "Middle East", detail: "UAE, Saudi Arabia, Turkey", icon: "compass" },
+  { region: "Asia-Pacific", detail: "China, India, South Korea, Japan", icon: "earth-asia" },
 ];
 
 export const HOW_WE_WORK = [
@@ -102,10 +102,10 @@ export const HOW_WE_WORK = [
 ];
 
 export const ABOUT_FEATURES = [
-  { icon: "globe", title: "Global Network", desc: "Trusted manufacturers across 4 major regions" },
-  { icon: "shield-check", title: "Verified Partners", desc: "Strict verification for quality & reliability" },
-  { icon: "dollar-circle", title: "Competitive Prices", desc: "Best value through strong partnerships" },
-  { icon: "truck", title: "Reliable Delivery", desc: "On-time shipping to any destination" },
+  { icon: "calendar", title: "Founded 2026", desc: "Registered as a Wyoming LLC" },
+  { icon: "bar-chart", title: `${INDUSTRIES.length} Industries Served`, desc: "Sourcing across key industrial sectors" },
+  { icon: "map-pin", title: "Wyoming, USA", desc: "U.S.-registered and based" },
+  { icon: "box", title: `${PRODUCTS.length} Product Categories`, desc: "From valves to spare parts" },
 ];
 
 export const COMPANY_INFO = [
@@ -117,6 +117,7 @@ export const COMPANY_INFO = [
 
 export const CONTACT_INFO = [
   { label: "Sales", value: "sales@trademarco.com" },
+  { label: "WhatsApp", value: "+1 (307) 999-8667", icon: "whatsapp", href: "https://wa.me/13079998667" },
   { label: "Support", value: "support@trademarco.com" },
   { label: "General", value: "info@trademarco.com" },
   { label: "Phone", value: "+1 (307) 999-8667" },
