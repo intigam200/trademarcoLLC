@@ -1,0 +1,80 @@
+import { useState } from "react";
+import { COLORS } from "../theme/colors";
+
+export default function Icon({ type, size = 32, color = COLORS.navy, className = "" }) {
+  const [pulsing, setPulsing] = useState(false);
+  const hoverColor = color === COLORS.orange ? "#4C89DE" : COLORS.orange;
+  const s = { width: size, height: size, display: "block", cursor: "pointer", "--tm-icon-color": color, "--tm-icon-hover-color": hoverColor };
+  const cls = ["tm-icon", pulsing ? "tm-icon-pulsing" : "", className].filter(Boolean).join(" ");
+  const handleClick = () => setPulsing(true);
+  const handleAnimEnd = () => setPulsing(false);
+  const sw = 1.5;
+  switch (type) {
+    case "valve":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="18" r="7" stroke="currentColor" strokeWidth={sw}/><line x1="16" y1="11" x2="16" y2="6" stroke="currentColor" strokeWidth={sw}/><line x1="11" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth={sw}/><line x1="9" y1="18" x2="4" y2="18" stroke="currentColor" strokeWidth={sw}/><line x1="23" y1="18" x2="28" y2="18" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "filter":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 8h20l-7 9v7l-6 2V17L6 8z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/></svg>);
+    case "pipe":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12h10v8H4zM18 12h10v8H18zM14 14h4v4h-4z" stroke="currentColor" strokeWidth={sw}/><line x1="6" y1="12" x2="6" y2="8" stroke="currentColor" strokeWidth={sw}/><line x1="10" y1="12" x2="10" y2="8" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "instrument":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="10" stroke="currentColor" strokeWidth={sw}/><line x1="16" y1="16" x2="21" y2="11" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><line x1="16" y1="6" x2="16" y2="8" stroke="currentColor" strokeWidth={sw}/><line x1="16" y1="24" x2="16" y2="26" stroke="currentColor" strokeWidth={sw}/><line x1="6" y1="16" x2="8" y2="16" stroke="currentColor" strokeWidth={sw}/><line x1="24" y1="16" x2="26" y2="16" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "electrical":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 4L10 18h6l-2 10 10-14h-6l2-10z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/></svg>);
+    case "spare":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="10" stroke="currentColor" strokeWidth={sw}/><circle cx="16" cy="16" r="4" stroke="currentColor" strokeWidth={sw}/><line x1="16" y1="6" x2="16" y2="12" stroke="currentColor" strokeWidth={sw}/><line x1="16" y1="20" x2="16" y2="26" stroke="currentColor" strokeWidth={sw}/><line x1="6" y1="16" x2="12" y2="16" stroke="currentColor" strokeWidth={sw}/><line x1="20" y1="16" x2="26" y2="16" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "check":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 16l6 6L24 10" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/></svg>);
+    case "arrow-right":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="6" y1="16" x2="24" y2="16" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><path d="M20 10l6 6-6 6" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"/></svg>);
+    case "globe":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="11" stroke="currentColor" strokeWidth={sw}/><ellipse cx="16" cy="16" rx="5" ry="11" stroke="currentColor" strokeWidth={sw}/><line x1="5" y1="12" x2="27" y2="12" stroke="currentColor" strokeWidth={sw}/><line x1="5" y1="20" x2="27" y2="20" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "menu":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="6" y1="9" x2="26" y2="9" stroke="currentColor" strokeWidth={2} strokeLinecap="round"/><line x1="6" y1="16" x2="26" y2="16" stroke="currentColor" strokeWidth={2} strokeLinecap="round"/><line x1="6" y1="23" x2="26" y2="23" stroke="currentColor" strokeWidth={2} strokeLinecap="round"/></svg>);
+    case "close":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="8" y1="8" x2="24" y2="24" stroke="currentColor" strokeWidth={2} strokeLinecap="round"/><line x1="24" y1="8" x2="8" y2="24" stroke="currentColor" strokeWidth={2} strokeLinecap="round"/></svg>);
+    case "shield-check":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 4l10 4v8c0 7-4.4 11-10 12-5.6-1-10-5-10-12V8l10-4z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><path d="M11 16l3.5 3.5L21 12" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"/></svg>);
+    case "truck":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="10" width="15" height="10" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><path d="M18 14h5l4 4v2h-9v-6z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><circle cx="9.5" cy="22.5" r="2.2" stroke="currentColor" strokeWidth={sw}/><circle cx="22.5" cy="22.5" r="2.2" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "headset":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 17v-2a10 10 0 0120 0v2" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><rect x="4" y="16" width="5" height="8" rx="2" stroke="currentColor" strokeWidth={sw}/><rect x="23" y="16" width="5" height="8" rx="2" stroke="currentColor" strokeWidth={sw}/><path d="M28 24v1a4 4 0 01-4 4h-4" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "factory":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 28V16l6 5v-5l6 5v-5l6 5V9h4v19H4z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round"/><line x1="24" y1="9" x2="24" y2="5" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "oil-rig":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="26" x2="29" y2="26" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><path d="M16 5l5 13h-10z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="16" y1="5" x2="16" y2="2" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><rect x="9" y="18" width="14" height="5" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="12" y1="23" x2="9" y2="26" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><line x1="20" y1="23" x2="23" y2="26" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "mining-cart":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 14l3-6h6l3 6" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round"/><path d="M6 14h20l-2.5 9h-15z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><circle cx="11.5" cy="26" r="2.3" stroke="currentColor" strokeWidth={sw}/><circle cx="20.5" cy="26" r="2.3" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "ship":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 20h22l-3 7H8z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="16" y1="20" x2="16" y2="6" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><path d="M16 7l7 4.5h-7z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="10" y1="20" x2="10" y2="14" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "gear":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="4.5" stroke="currentColor" strokeWidth={sw}/><path d="M16 4v3.5M16 24.5V28M4 16h3.5M24.5 16H28M7.5 7.5l2.47 2.47M22.03 22.03l2.47 2.47M24.5 7.5l-2.47 2.47M9.97 22.03l-2.47 2.47" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "dollar-circle":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="11" stroke="currentColor" strokeWidth={sw}/><path d="M19 12.5c0-1.7-1.6-3-3.5-3s-3.5 1.2-3.5 2.8c0 3.6 7 1.8 7 5.4 0 1.6-1.6 2.8-3.5 2.8s-3.5-1.3-3.5-3" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><line x1="16" y1="8" x2="16" y2="24" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "document":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 4h11l7 7v17H8V4z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><path d="M19 4v7h7" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="12" y1="17" x2="22" y2="17" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><line x1="12" y1="21" x2="22" y2="21" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><line x1="12" y1="25" x2="18" y2="25" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "search":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="8" stroke="currentColor" strokeWidth={sw}/><line x1="20" y1="20" x2="26" y2="26" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "clipboard":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="16" height="22" rx="2" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><rect x="12" y="4" width="8" height="5" rx="1.5" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="11.5" y1="15" x2="20.5" y2="15" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><line x1="11.5" y1="20" x2="20.5" y2="20" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><line x1="11.5" y1="25" x2="17" y2="25" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/></svg>);
+    case "box":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 4l12 6v14l-12 6-12-6V10z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><path d="M4 10l12 6 12-6" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><line x1="16" y1="16" x2="16" y2="30" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "mail":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="24" height="16" rx="2" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><path d="M4 9l12 9 12-9" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/></svg>);
+    case "phone":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 5.5c1 0 2.7.4 2.9 1.9.2 1.4-1.1 2-.7 3.3.7 2.5 3.8 5.6 6.3 6.3 1.3.4 1.9-.9 3.3-.7 1.5.2 1.9 1.9 1.9 2.9 0 1.8-1.7 3.3-3.5 3.3-6 0-13.3-7.3-13.3-13.3 0-1.8 1.5-3.5 3.1-3.7z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/></svg>);
+    case "map-pin":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 4c-5 0-9 4-9 9 0 6.5 9 15 9 15s9-8.5 9-15c0-5-4-9-9-9z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/><circle cx="16" cy="13" r="3.2" stroke="currentColor" strokeWidth={sw}/></svg>);
+    case "clock":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="11" stroke="currentColor" strokeWidth={sw}/><path d="M16 9.5V16l4.5 3" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"/></svg>);
+    case "linkedin":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9.5" cy="9" r="1.6" fill="currentColor"/><line x1="9.5" y1="13" x2="9.5" y2="23" stroke="currentColor" strokeWidth={sw} strokeLinecap="round"/><path d="M14.5 23v-6c0-1.9 1.3-3.2 3.2-3.2s3.3 1.3 3.3 3.2v6" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"/></svg>);
+    case "facebook":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-2.3c-1.9 0-3.2 1.3-3.2 3.3V15h-2.5v3.5h2.5V23h3.5v-4.5h2.8l.6-3.5h-3.4v-2.2c0-.7.4-1.1 1.1-1.1H19z" stroke="currentColor" strokeWidth={sw} strokeLinejoin="round"/></svg>);
+    case "instagram":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="20" height="20" rx="6" stroke="currentColor" strokeWidth={sw}/><circle cx="16" cy="16" r="5" stroke="currentColor" strokeWidth={sw}/><circle cx="21.5" cy="10.5" r="1.1" fill="currentColor"/></svg>);
+    case "youtube":
+      return (<svg className={cls} style={s} onClick={handleClick} onAnimationEnd={handleAnimEnd} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="9" width="24" height="14" rx="4" stroke="currentColor" strokeWidth={sw}/><path d="M13.5 12.8l6.5 3.2-6.5 3.2v-6.4z" fill="currentColor"/></svg>);
+    default:
+      return null;
+  }
+}
