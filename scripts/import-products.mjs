@@ -4,6 +4,10 @@
 // part of the app — adding products later means running this again with a
 // new/updated CSV, not touching any component code.
 //
+// Parsing/validation logic lives in src/data/catalog/schema.js and is
+// shared with the admin Import wizard (src/admin/pages/Import.jsx), so a
+// CSV validates identically whether it's checked in the browser or here.
+//
 // Usage:
 //   node scripts/import-products.mjs [--csv=path] [--out=path] [--dry-run]
 //
@@ -13,7 +17,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { MANUFACTURERS, PRODUCTS as CATEGORIES, INDUSTRIES } from "../src/data/content.js";
-import { buildProduct } from "../src/data/catalog/schema.js";
+import { parseCSV, validateRows } from "../src/data/catalog/schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, "..");
@@ -21,43 +25,6 @@ const rootDir = resolve(__dirname, "..");
 function getArg(name, fallback) {
   const found = process.argv.find((a) => a.startsWith(`--${name}=`));
   return found ? found.slice(`--${name}=`.length) : fallback;
-}
-
-function parseCSV(text) {
-  const rows = [];
-  let row = [];
-  let field = "";
-  let inQuotes = false;
-  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-
-  const pushField = () => { row.push(field); field = ""; };
-  const pushRow = () => { rows.push(row); row = []; };
-
-  for (let i = 0; i < normalized.length; i++) {
-    const c = normalized[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (normalized[i + 1] === '"') { field += '"'; i++; }
-        else inQuotes = false;
-      } else {
-        field += c;
-      }
-    } else if (c === '"') {
-      inQuotes = true;
-    } else if (c === ",") {
-      pushField();
-    } else if (c === "\n") {
-      pushField();
-      pushRow();
-    } else {
-      field += c;
-    }
-  }
-  if (field.length || row.length) { pushField(); pushRow(); }
-
-  const cleaned = rows.filter((r, idx) => !(idx === rows.length - 1 && r.length === 1 && r[0] === ""));
-  const headers = cleaned[0];
-  return cleaned.slice(1).map((r) => Object.fromEntries(headers.map((h, i) => [h, r[i] ?? ""])));
 }
 
 function main() {
@@ -68,55 +35,31 @@ function main() {
   const csvText = readFileSync(csvPath, "utf8");
   const rows = parseCSV(csvText);
 
-  const manufacturerSlugs = new Set(MANUFACTURERS.map((m) => m.slug));
-  const categorySlugs = new Set(CATEGORIES.map((c) => c.slug));
-  const industryNames = new Set(INDUSTRIES.map((i) => i.name.toLowerCase()));
-
-  const errors = [];
-  const seenIds = new Set();
-  const byManufacturer = new Map();
-
-  rows.forEach((row, idx) => {
-    const rowNumber = idx + 2; // header is row 1
-    const { product, errors: rowErrors } = buildProduct(row, rowNumber);
-    if (rowErrors.length) { errors.push(...rowErrors); return; }
-
-    if (!manufacturerSlugs.has(product.manufacturer)) {
-      errors.push(`Row ${rowNumber}: unknown manufacturer "${row.manufacturer}" (not in MANUFACTURERS)`);
-      return;
-    }
-    if (!categorySlugs.has(product.category)) {
-      errors.push(`Row ${rowNumber}: unknown category "${row.category}" (not in PRODUCTS categories)`);
-      return;
-    }
-    const badIndustries = product.industries.filter((i) => !industryNames.has(i.toLowerCase()));
-    if (badIndustries.length) {
-      errors.push(`Row ${rowNumber}: unknown industr${badIndustries.length > 1 ? "ies" : "y"} "${badIndustries.join(", ")}"`);
-      return;
-    }
-    if (seenIds.has(product.id)) {
-      errors.push(`Row ${rowNumber}: duplicate product id "${product.id}" (part number already used for this manufacturer)`);
-      return;
-    }
-    seenIds.add(product.id);
-
-    if (!byManufacturer.has(product.manufacturer)) byManufacturer.set(product.manufacturer, []);
-    byManufacturer.get(product.manufacturer).push(product);
+  const { validProducts, issues } = validateRows(rows, {
+    manufacturerSlugs: new Set(MANUFACTURERS.map((m) => m.slug)),
+    categorySlugs: new Set(CATEGORIES.map((c) => c.slug)),
+    industryNames: new Set(INDUSTRIES.map((i) => i.name.toLowerCase())),
   });
 
-  if (errors.length) {
-    console.error(`\nImport failed with ${errors.length} error(s):\n`);
-    errors.forEach((e) => console.error(`  - ${e}`));
+  const allIssues = Object.values(issues).flat();
+  if (allIssues.length) {
+    console.error(`\nImport failed with ${allIssues.length} error(s):\n`);
+    for (const [type, list] of Object.entries(issues)) {
+      list.forEach((i) => console.error(`  - [${type}] Row ${i.rowNumber}: ${i.message}`));
+    }
     process.exit(1);
   }
 
-  const indexEntries = [];
-  for (const products of byManufacturer.values()) {
-    indexEntries.push(...products.map((p) => ({
-      id: p.id, slug: p.slug, manufacturer: p.manufacturer, partNumber: p.partNumber,
-      productName: p.productName, category: p.category,
-    })));
+  const byManufacturer = new Map();
+  for (const product of validProducts) {
+    if (!byManufacturer.has(product.manufacturer)) byManufacturer.set(product.manufacturer, []);
+    byManufacturer.get(product.manufacturer).push(product);
   }
+
+  const indexEntries = validProducts.map((p) => ({
+    id: p.id, slug: p.slug, manufacturer: p.manufacturer, partNumber: p.partNumber,
+    productName: p.productName, category: p.category,
+  }));
 
   console.log(`Parsed ${rows.length} row(s) -> ${indexEntries.length} valid product(s) across ${byManufacturer.size} manufacturer(s).`);
 

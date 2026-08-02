@@ -5,6 +5,9 @@ import {
   FiSearch, FiFileText, FiPhone, FiMail, FiMapPin, FiArrowRight, FiZap,
   FiSettings, FiClock, FiMenu, FiX, FiClipboard, FiBox, FiFilter, FiTool,
   FiActivity, FiCalendar, FiBarChart2, FiCompass,
+  FiEdit2, FiTrash2, FiEye, FiEyeOff, FiUpload, FiDownload, FiPlus, FiBell,
+  FiUser, FiLogOut, FiChevronDown, FiChevronUp, FiChevronLeft, FiChevronRight,
+  FiAlertTriangle, FiXCircle, FiMoreVertical, FiInfo, FiLock,
 } from "react-icons/fi";
 import { GiValve, GiPipes, GiOilDrum, GiFactory, GiMining, GiCargoShip, GiEarthAmerica, GiEarthAfricaEurope, GiEarthAsiaOceania } from "react-icons/gi";
 import { FaLinkedin, FaFacebook, FaInstagram, FaYoutube, FaWhatsapp } from "react-icons/fa";
@@ -49,6 +52,25 @@ const ICONS = {
   instagram: FaInstagram,
   youtube: FaYoutube,
   whatsapp: FaWhatsapp,
+  edit: FiEdit2,
+  trash: FiTrash2,
+  eye: FiEye,
+  "eye-off": FiEyeOff,
+  upload: FiUpload,
+  download: FiDownload,
+  plus: FiPlus,
+  bell: FiBell,
+  user: FiUser,
+  "log-out": FiLogOut,
+  "chevron-down": FiChevronDown,
+  "chevron-up": FiChevronUp,
+  "chevron-left": FiChevronLeft,
+  "chevron-right": FiChevronRight,
+  "alert-triangle": FiAlertTriangle,
+  "x-circle": FiXCircle,
+  "more-vertical": FiMoreVertical,
+  info: FiInfo,
+  lock: FiLock,
 };
 
 export default function Icon({ type, size = 32, color = COLORS.navy, className = "" }) {
