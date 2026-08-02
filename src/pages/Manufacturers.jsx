@@ -60,11 +60,27 @@ export default function Manufacturers() {
               padding: 28, textDecoration: "none",
             }}>
               <div style={{
-                width: 56, height: 56, borderRadius: 8, background: COLORS.iconBlueBg,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 20, fontWeight: 800, color: COLORS.iconBlue, marginBottom: 20, flexShrink: 0,
+                height: 64, display: "flex", alignItems: "center", justifyContent: "flex-start",
+                marginBottom: 20, flexShrink: 0,
               }}>
-                {m.name.charAt(0)}
+                {m.logo ? (
+                  <div style={{
+                    height: "100%", display: "flex", alignItems: "center", justifyContent: "center",
+                    background: m.logoDark ? COLORS.navy : "transparent",
+                    borderRadius: m.logoDark ? 8 : 0,
+                    padding: m.logoDark ? "8px 14px" : 0,
+                  }}>
+                    <img src={m.logo} alt={`${m.name} logo`} style={{ maxWidth: 140, maxHeight: m.logoDark ? 40 : "100%", objectFit: "contain" }} />
+                  </div>
+                ) : (
+                  <div style={{
+                    width: 56, height: 56, borderRadius: 8, background: COLORS.iconBlueBg,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 20, fontWeight: 800, color: COLORS.iconBlue,
+                  }}>
+                    {m.name.charAt(0)}
+                  </div>
+                )}
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: COLORS.navy, margin: "0 0 8px" }}>{m.name}</h3>
               <p style={{ fontSize: 14, lineHeight: 1.6, color: COLORS.medGray, margin: "0 0 20px", flexGrow: 1 }}>{m.desc}</p>

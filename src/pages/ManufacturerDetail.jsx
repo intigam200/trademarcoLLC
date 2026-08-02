@@ -72,6 +72,17 @@ export default function ManufacturerDetail() {
           maxWidth: 620, margin: "0 auto", textAlign: "center",
           background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, padding: "48px 32px",
         }}>
+          {manufacturer.logo && (
+            <div style={{
+              height: 56, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 28,
+              background: manufacturer.logoDark ? COLORS.navy : "transparent",
+              borderRadius: manufacturer.logoDark ? 8 : 0,
+              padding: manufacturer.logoDark ? "10px 18px" : 0,
+              width: "fit-content", margin: "0 auto 28px",
+            }}>
+              <img src={manufacturer.logo} alt={`${manufacturer.name} logo`} style={{ maxWidth: 180, maxHeight: manufacturer.logoDark ? 36 : "100%", objectFit: "contain" }} />
+            </div>
+          )}
           <h2 style={{ fontSize: 22, fontWeight: 700, color: COLORS.navy, margin: "0 0 12px" }}>
             Full {manufacturer.name} Product Profile Coming Soon
           </h2>
