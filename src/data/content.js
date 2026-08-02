@@ -1,6 +1,7 @@
 export const NAV_LINKS = [
   { label: "Home", href: "/#hero" },
   { label: "Products", href: "/products" },
+  { label: "Manufacturers", href: "/manufacturers" },
   { label: "Industries", href: "/#industries" },
   { label: "About", href: "/#about" },
   { label: "Company", href: "/company" },
@@ -50,6 +51,28 @@ export const PRODUCTS = [
     fullDescription: "Industrial spare parts and replacement components for maintenance, repair and operational requirements.",
     types: ["Replacement Parts", "Mechanical Components", "Seals & Gaskets", "Bearings", "Fasteners", "Pump Components", "Valve Components", "OEM / Equivalent Parts"],
   },
+];
+
+export const MANUFACTURERS = [
+  { slug: "abb", name: "ABB", desc: "Global technology leader in electrification and industrial automation." },
+  { slug: "emerson", name: "Emerson", desc: "Global provider of automation, measurement and control technologies for process industries." },
+  { slug: "fisher", name: "Fisher", desc: "Control valve and regulator brand widely used in process control applications." },
+  { slug: "parker", name: "Parker", desc: "Global manufacturer of motion and control technologies, including hydraulics, pneumatics and fluid connectors." },
+  { slug: "honeywell", name: "Honeywell", desc: "Diversified technology manufacturer with a strong presence in industrial automation and process instrumentation." },
+  { slug: "yokogawa", name: "Yokogawa", desc: "Manufacturer specializing in industrial automation, measurement and control instrumentation." },
+  { slug: "siemens", name: "Siemens", desc: "Global industrial manufacturer providing automation, electrification and digitalization technologies." },
+  { slug: "swagelok", name: "Swagelok", desc: "Manufacturer of fluid system products including fittings, valves and tubing for critical applications." },
+  { slug: "spirax-sarco", name: "Spirax Sarco", desc: "Specialist manufacturer of steam and thermal energy management solutions." },
+  { slug: "flowserve", name: "Flowserve", desc: "Manufacturer of flow control products, including pumps, valves and seals for industrial applications." },
+  { slug: "velan", name: "Velan", desc: "Manufacturer of industrial valves for severe-service and critical applications." },
+  { slug: "samson", name: "Samson", desc: "Manufacturer of control valves and instrumentation for process automation." },
+];
+
+export const OEM_FEATURES = [
+  { icon: "shield-check", title: "Genuine Products", desc: "We source through manufacturers and authorized supply channels to help ensure product authenticity." },
+  { icon: "truck", title: "Worldwide Delivery", desc: "Shipping and logistics coordination to deliver products to your location worldwide." },
+  { icon: "headset", title: "Technical Support", desc: "Our team helps match the right product and specification to your application." },
+  { icon: "clock", title: "Fast RFQ Response", desc: "Submit your requirements and our team responds promptly with sourcing options." },
 ];
 
 export const INDUSTRIES = [
