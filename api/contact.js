@@ -1,3 +1,5 @@
+import nodemailer from "nodemailer";
+
 const RECIPIENTS = ["info@trademarco.com", "sales@trademarco.com", "admin@trademarco.com"];
 
 export default async function handler(req, res) {
@@ -12,13 +14,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Name, email and message are required." });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error("RESEND_API_KEY is not configured");
+  const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, SMTP_FROM } = process.env;
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
+    console.error("SMTP environment variables are not fully configured");
     return res.status(500).json({ error: "Email service is not configured." });
   }
-
-  const fromAddress = process.env.RESEND_FROM || "TradeMarco RFQ <onboarding@resend.dev>";
 
   const bodyLines = [
     `Name: ${name}`,
@@ -32,26 +32,20 @@ export default async function handler(req, res) {
   ].filter(Boolean).join("\n");
 
   try {
-    const resendRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: fromAddress,
-        to: RECIPIENTS,
-        reply_to: email,
-        subject: `New RFQ from ${name}${company ? ` (${company})` : ""}`,
-        text: bodyLines,
-      }),
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: Number(SMTP_PORT),
+      secure: SMTP_SECURE ? SMTP_SECURE === "true" : Number(SMTP_PORT) === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
 
-    if (!resendRes.ok) {
-      const errBody = await resendRes.text();
-      console.error("Resend API error:", errBody);
-      return res.status(502).json({ error: "Failed to send email." });
-    }
+    await transporter.sendMail({
+      from: SMTP_FROM || SMTP_USER,
+      to: RECIPIENTS,
+      replyTo: email,
+      subject: `New RFQ from ${name}${company ? ` (${company})` : ""}`,
+      text: bodyLines,
+    });
 
     return res.status(200).json({ ok: true });
   } catch (err) {
