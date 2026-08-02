@@ -3,8 +3,8 @@ import { COLORS } from "../theme/colors";
 import Icon from "./Icon";
 import Button from "./Button";
 
-export default function ContactForm() {
-  const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", country: "", message: "" });
+export default function ContactForm({ initialMessage = "" }) {
+  const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", country: "", message: initialMessage });
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [errorMsg, setErrorMsg] = useState("");
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });

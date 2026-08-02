@@ -5,6 +5,7 @@ import Company from "./pages/Company";
 import Products from "./pages/Products";
 import Manufacturers from "./pages/Manufacturers";
 import ManufacturerDetail from "./pages/ManufacturerDetail";
+import ProductDetail from "./pages/ProductDetail";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/manufacturers" element={<Manufacturers />} />
           <Route path="/manufacturers/:slug" element={<ManufacturerDetail />} />
+          <Route path="/manufacturers/:manufacturerSlug/:productSlug" element={<ProductDetail />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>
