@@ -6,8 +6,9 @@ const STATUS_STYLES = {
   active: { bg: ADMIN_COLORS.successBg, color: ADMIN_COLORS.success, label: "Active" },
   inactive: { bg: ADMIN_COLORS.neutralBg, color: ADMIN_COLORS.neutral, label: "Inactive" },
   archived: { bg: ADMIN_COLORS.dangerBg, color: ADMIN_COLORS.danger, label: "Archived" },
-  new: { bg: ADMIN_COLORS.warningBg, color: ADMIN_COLORS.warning, label: "New" },
-  quoted: { bg: ADMIN_COLORS.iconBlueBg, color: ADMIN_COLORS.iconBlue, label: "Quoted" },
+  unread: { bg: ADMIN_COLORS.warningBg, color: ADMIN_COLORS.warning, label: "Unread" },
+  in_progress: { bg: ADMIN_COLORS.iconBlueBg, color: ADMIN_COLORS.iconBlue, label: "In Progress" },
+  quoted: { bg: ADMIN_COLORS.successBg, color: ADMIN_COLORS.success, label: "Quoted" },
   closed: { bg: ADMIN_COLORS.neutralBg, color: ADMIN_COLORS.neutral, label: "Closed" },
 };
 

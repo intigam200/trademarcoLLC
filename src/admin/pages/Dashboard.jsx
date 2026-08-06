@@ -1,6 +1,9 @@
-import { useEffect } from "react";
-import { MANUFACTURERS, PRODUCTS as CATEGORIES } from "../../data/content";
-import { MOCK_RFQS, MOCK_RECENT_ACTIVITY, MOCK_RECENT_IMPORTS, SYSTEM_STATUS } from "../data/mock";
+import { useEffect, useState } from "react";
+import { countManufacturers } from "../../lib/supabase/manufacturers";
+import { countCategories } from "../../lib/supabase/categories";
+import { countProducts, listProducts } from "../../lib/supabase/products";
+import { countRFQs } from "../../lib/supabase/rfqs";
+import { MOCK_RECENT_ACTIVITY } from "../data/mock";
 import { ADMIN_COLORS } from "../theme";
 import AdminCard from "../components/AdminCard";
 import PageHeader from "../components/PageHeader";
@@ -10,13 +13,13 @@ const STATUS_DOT = {
   operational: ADMIN_COLORS.success,
   configured: ADMIN_COLORS.iconBlue,
   empty: ADMIN_COLORS.warning,
-  not_connected: ADMIN_COLORS.medGray,
+  error: ADMIN_COLORS.danger,
 };
 const STATUS_LABEL = {
   operational: "Operational",
   configured: "Configured",
   empty: "Empty",
-  not_connected: "Not Connected",
+  error: "Error",
 };
 
 function EmptyState({ text }) {
@@ -26,21 +29,42 @@ function EmptyState({ text }) {
 export default function Dashboard() {
   useEffect(() => { document.title = "Dashboard | TradeMarco Admin"; }, []);
 
-  // Products/Manufacturers/Categories reflect real app data (the live catalog
-  // is intentionally empty in Phase 1). Pending RFQs is sample data — there's
-  // no RFQ backend yet.
-  const pendingRFQs = MOCK_RFQS.filter((r) => r.status !== "closed").length;
+  const [counts, setCounts] = useState(null);
+  const [countsError, setCountsError] = useState("");
+  const [recentProducts, setRecentProducts] = useState([]);
+
+  useEffect(() => {
+    Promise.all([
+      countProducts({ status: "published" }),
+      countManufacturers(),
+      countCategories(),
+      countRFQs({ status: "unread" }),
+    ])
+      .then(([products, manufacturers, categories, pendingRfqs]) => {
+        setCounts({ products, manufacturers, categories, pendingRfqs });
+      })
+      .catch((err) => setCountsError(err.message));
+
+    listProducts().then((data) => setRecentProducts(data.slice(0, 5))).catch(() => {});
+  }, []);
 
   const kpis = [
-    { label: "Products", value: 0, icon: "box", note: "Catalog not yet populated" },
-    { label: "Manufacturers", value: MANUFACTURERS.length, icon: "factory" },
-    { label: "Categories", value: CATEGORIES.length, icon: "clipboard" },
-    { label: "Pending RFQs", value: pendingRFQs, icon: "mail", note: "Sample data" },
+    { label: "Products", value: counts?.products ?? "—", icon: "box", note: "Published only" },
+    { label: "Manufacturers", value: counts?.manufacturers ?? "—", icon: "factory" },
+    { label: "Categories", value: counts?.categories ?? "—", icon: "clipboard" },
+    { label: "Pending RFQs", value: counts?.pendingRfqs ?? "—", icon: "mail" },
+  ];
+
+  const systemStatus = [
+    { label: "Website", status: "operational" },
+    { label: "RFQ Email (SMTP)", status: "configured" },
+    { label: "Supabase Database", status: countsError ? "error" : counts ? "operational" : "configured", note: countsError || undefined },
+    { label: "Product Catalog", status: counts?.products ? "operational" : "empty", note: counts ? `${counts.products} published` : undefined },
   ];
 
   return (
     <div>
-      <PageHeader title="Dashboard" description="Overview of the TradeMarco catalog and RFQ pipeline." />
+      <PageHeader title="Dashboard" description="Overview of the TradeMarco catalog and RFQ pipeline — live from Supabase." />
 
       <div className="tm-admin-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 24 }}>
         {kpis.map((k) => (
@@ -79,12 +103,15 @@ export default function Dashboard() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <AdminCard title="Recent Imports">
-            {MOCK_RECENT_IMPORTS.length === 0 ? (
-              <EmptyState text="No imports yet — run one from the Import page." />
+            {recentProducts.length === 0 ? (
+              <EmptyState text="No products yet — run an import from the Import page or add one manually." />
             ) : (
-              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 14 }}>
-                {MOCK_RECENT_IMPORTS.map((imp) => (
-                  <li key={imp.id} style={{ fontSize: 13, color: ADMIN_COLORS.darkGray }}>{imp.file}</li>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+                {recentProducts.map((p) => (
+                  <li key={p.id} style={{ fontSize: 13, color: ADMIN_COLORS.darkGray, display: "flex", justifyContent: "space-between", gap: 12 }}>
+                    <span>{p.product_name}</span>
+                    <span style={{ color: ADMIN_COLORS.medGray, fontSize: 12, whiteSpace: "nowrap" }}>{new Date(p.updated_at).toLocaleDateString()}</span>
+                  </li>
                 ))}
               </ul>
             )}
@@ -92,7 +119,7 @@ export default function Dashboard() {
 
           <AdminCard title="System Status">
             <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-              {SYSTEM_STATUS.map((s) => (
+              {systemStatus.map((s) => (
                 <li key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, gap: 12 }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 8, color: ADMIN_COLORS.darkGray }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: STATUS_DOT[s.status], flexShrink: 0 }} />
