@@ -1,5 +1,5 @@
 -- ============================================================================
--- TradeMarco — Supabase schema
+-- Trademarco Global — Supabase schema
 --
 -- Run this once in your Supabase project's SQL Editor (Dashboard > SQL Editor
 -- > New query), on a fresh project. Safe to re-run — every statement is
@@ -156,6 +156,8 @@ create index if not exists idx_product_related_product on product_related (produ
 -- ============================================================================
 create table if not exists rfqs (
   id                uuid primary key default gen_random_uuid(),
+  request_number    int, -- sequence position within request_id's year, e.g. 1 for RFQ-2026-000001
+  request_id        text unique, -- human-readable id shown to customers/staff, e.g. "RFQ-2026-000001"
   company           text, -- optional: the public contact form doesn't require a company name
   contact_name      text not null,
   email             text not null,
@@ -190,6 +192,9 @@ alter table rfqs add column if not exists page_url text;
 alter table rfqs add column if not exists notes text;
 alter table rfqs add column if not exists ip_address text;
 alter table rfqs add column if not exists user_agent text;
+alter table rfqs add column if not exists request_number int;
+alter table rfqs add column if not exists request_id text;
+create unique index if not exists idx_rfqs_request_id on rfqs (request_id);
 
 update rfqs set status = 'unread' where status = 'new';
 
@@ -207,6 +212,39 @@ drop trigger if exists trg_rfqs_updated_at on rfqs;
 create trigger trg_rfqs_updated_at
   before update on rfqs
   for each row execute function set_updated_at();
+
+-- Per-year atomic counter backing human-readable request IDs (RFQ-2026-000001,
+-- RFQ-2026-000002, ...). A plain "select max(request_number)+1" would race
+-- under concurrent inserts; the upsert below is atomic under Postgres's
+-- row-level locking, so two simultaneous RFQ submissions can never collide
+-- on the same number.
+create table if not exists rfq_counters (
+  year        int primary key,
+  next_value  int not null default 1
+);
+
+create or replace function assign_rfq_request_id()
+returns trigger as $$
+declare
+  yr  int := extract(year from now())::int;
+  seq int;
+begin
+  insert into rfq_counters (year, next_value) values (yr, 2)
+  on conflict (year) do update set next_value = rfq_counters.next_value + 1
+  returning next_value - 1 into seq;
+
+  new.request_number := seq;
+  new.request_id := 'RFQ-' || yr || '-' || lpad(seq::text, 6, '0');
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trg_rfqs_request_id on rfqs;
+create trigger trg_rfqs_request_id
+  before insert on rfqs
+  for each row
+  when (new.request_id is null)
+  execute function assign_rfq_request_id();
 
 
 -- ============================================================================
@@ -264,7 +302,13 @@ alter table categories      enable row level security;
 alter table products        enable row level security;
 alter table product_related enable row level security;
 alter table rfqs            enable row level security;
+alter table rfq_counters    enable row level security;
 alter table users           enable row level security;
+
+-- rfq_counters is only ever touched by the request-id trigger, invoked as
+-- part of a service-role insert into rfqs (see api/rfq.js) — the service
+-- role bypasses RLS entirely, so no policy is needed or added here. RLS is
+-- still enabled so no other role can read or write it.
 
 drop policy if exists "Public can read active manufacturers" on manufacturers;
 create policy "Public can read active manufacturers"

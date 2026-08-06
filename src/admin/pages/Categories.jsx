@@ -22,7 +22,7 @@ const COLUMNS = [
 const EMPTY_FORM = { name: "", description: "", full_description: "", image_url: "", types: [], parent_id: "", seo_title: "", seo_description: "", status: "active" };
 
 export default function AdminCategories() {
-  useEffect(() => { document.title = "Categories | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "Categories | Trademarco Global Admin"; }, []);
   const [categories, setCategories] = useState(null);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);

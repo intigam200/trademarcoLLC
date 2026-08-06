@@ -99,7 +99,7 @@ export function buildProduct(row, rowNumber) {
     relatedProducts: splitMulti(row.relatedProducts),
     rfqAvailable: row.rfqAvailable === undefined || row.rfqAvailable === "" ? true : /^(true|yes|1)$/i.test(row.rfqAvailable.trim()),
     seo: {
-      title: (row.seoTitle && row.seoTitle.trim()) || `${row.productName.trim()} | ${row.manufacturer.trim()} | TradeMarco`,
+      title: (row.seoTitle && row.seoTitle.trim()) || `${row.productName.trim()} | ${row.manufacturer.trim()} | Trademarco Global`,
       description: (row.seoDescription && row.seoDescription.trim()) || row.shortDescription.trim(),
     },
   };

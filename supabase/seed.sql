@@ -1,5 +1,5 @@
 -- ============================================================================
--- TradeMarco — optional seed data
+-- Trademarco Global — optional seed data
 --
 -- Reproduces the manufacturers and categories that are already live on the
 -- site today (currently hardcoded in src/data/content.js), so the public

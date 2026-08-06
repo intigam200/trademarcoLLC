@@ -22,7 +22,7 @@ const COLUMNS = [
 ];
 
 export default function AdminProducts() {
-  useEffect(() => { document.title = "Products | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "Products | Trademarco Global Admin"; }, []);
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [totalCount, setTotalCount] = useState(0);

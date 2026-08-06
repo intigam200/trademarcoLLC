@@ -14,7 +14,7 @@ export default function Login() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.title = "Admin Login | TradeMarco";
+    document.title = "Admin Login | Trademarco Global";
   }, []);
 
   if (status === "authenticated") {
@@ -50,7 +50,7 @@ export default function Login() {
     }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-          <img src="/images/products/logo.png" alt="TradeMarco" style={{ height: 40, width: "auto" }} />
+          <img src="/images/products/logo.png" alt="Trademarco Global" style={{ height: 40, width: "auto" }} />
         </div>
 
         <div style={{ background: ADMIN_COLORS.white, borderRadius: 10, padding: "36px 32px", boxShadow: "0 20px 50px rgba(0,0,0,0.25)" }}>
@@ -135,7 +135,7 @@ export default function Login() {
         </div>
 
         <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 20 }}>
-          TradeMarco internal admin panel &middot; access is restricted to authorized staff.
+          Trademarco Global internal admin panel &middot; access is restricted to authorized staff.
         </p>
       </div>
     </div>

@@ -174,7 +174,7 @@ export default async function handler(req, res) {
       ip_address: ip,
       user_agent: clean(req.headers["user-agent"] || "") || null,
     })
-    .select("id, created_at")
+    .select("id, request_id, created_at")
     .single();
 
   if (insertError) {
@@ -184,6 +184,7 @@ export default async function handler(req, res) {
 
   const rfq = {
     id: inserted.id,
+    requestId: inserted.request_id,
     createdAt: new Date(inserted.created_at).toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" }),
     contactName: fields.name,
     company: fields.company,
@@ -201,5 +202,5 @@ export default async function handler(req, res) {
 
   await sendEmails(rfq);
 
-  return res.status(200).json({ ok: true, id: inserted.id });
+  return res.status(200).json({ ok: true, id: inserted.id, requestId: inserted.request_id });
 }

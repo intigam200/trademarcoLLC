@@ -1,4 +1,10 @@
-export const SITE_URL = "https://trademarco.com";
+// trademarco.com is registered but its DNS isn't pointed at this Vercel
+// project yet (nameservers still resolve elsewhere), so it can't be used for
+// absolute URLs — anything built from it (canonical links, OG images, email
+// logos) would silently 404. Falls back to the real, currently-working
+// deployment URL. Once the domain's DNS is fixed, set VITE_SITE_URL and this
+// updates everywhere with no code change.
+export const SITE_URL = import.meta.env.VITE_SITE_URL || "https://trademarco-llc.vercel.app";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/images/products/logo.png`;
 
 function setMeta(attr, key, content) {

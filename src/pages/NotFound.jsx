@@ -7,7 +7,7 @@ import Icon from "../components/Icon";
 import Button from "../components/Button";
 
 export default function NotFound() {
-  useEffect(() => { setNoIndexSEO("Page Not Found | TradeMarco Global"); }, []);
+  useEffect(() => { setNoIndexSEO("Page Not Found | Trademarco Global"); }, []);
 
   return (
     <Section bg={COLORS.white}>

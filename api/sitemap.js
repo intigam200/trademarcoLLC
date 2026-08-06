@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
-const SITE_URL = "https://trademarco.com";
+// trademarco.com's DNS isn't pointed at this deployment yet — see SITE_URL
+// in src/lib/seo.js for the full explanation. Set SITE_URL once DNS is fixed.
+const SITE_URL = process.env.SITE_URL || "https://trademarco-llc.vercel.app";
 
 function urlEntry({ loc, lastmod, priority }) {
   return [

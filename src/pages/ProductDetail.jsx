@@ -59,14 +59,14 @@ export default function ProductDetail() {
       const mfrName = product.manufacturer?.name ?? "";
       const label = [mfrName, product.part_number, product.product_name].filter(Boolean).join(" ");
       setSEO({
-        title: product.seo_title || `${label} | TradeMarco Global`,
+        title: product.seo_title || `${label} | Trademarco Global`,
         description: product.seo_description || `Buy ${label} from Trademarco Global. Worldwide supplier of industrial automation products. Request a quotation today.`,
         image: product.image_url || undefined,
         type: "product",
         path: `/manufacturers/${manufacturerSlug}/${productSlug}`,
       });
     } else if (status === "not-found") {
-      setNoIndexSEO("Product Not Found | TradeMarco Global");
+      setNoIndexSEO("Product Not Found | Trademarco Global");
     }
   }, [status, product, manufacturerSlug, productSlug]);
 
@@ -277,10 +277,7 @@ export default function ProductDetail() {
               <div style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, padding: 28 }}>
                 {product.rfq_available ? (
                   <>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>Request a Quote</h3>
-                    <p style={{ fontSize: 13, color: COLORS.medGray, margin: "0 0 20px" }}>
-                      For {product.part_number} — {manufacturerName}
-                    </p>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: COLORS.navy, margin: "0 0 20px" }}>Request a Quote</h3>
                     <ContactForm
                       productId={product.id}
                       manufacturerName={manufacturerName}

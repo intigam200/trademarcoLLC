@@ -1,5 +1,5 @@
 -- ============================================================================
--- TradeMarco — Supabase Storage setup
+-- Trademarco Global — Supabase Storage setup
 --
 -- Run after schema.sql, in the SQL Editor. Creates the two buckets the admin
 -- panel uploads to (product images, PDF datasheets), both public-read so the

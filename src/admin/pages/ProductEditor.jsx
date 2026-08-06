@@ -41,7 +41,7 @@ export default function ProductEditor() {
   const [uploadingDatasheet, setUploadingDatasheet] = useState(false);
 
   useEffect(() => {
-    document.title = `${isEditing ? "Edit" : "Add"} Product | TradeMarco Admin`;
+    document.title = `${isEditing ? "Edit" : "Add"} Product | Trademarco Global Admin`;
   }, [isEditing]);
 
   useEffect(() => {
@@ -328,7 +328,7 @@ export default function ProductEditor() {
           <AdminCard title="SEO">
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <FormField label="SEO Title" hint="Defaults to a generated title if left blank.">
-                <input style={inputStyle} value={form.seoTitle} onChange={set("seoTitle")} placeholder={form.productName ? `${form.productName} | TradeMarco` : ""} />
+                <input style={inputStyle} value={form.seoTitle} onChange={set("seoTitle")} placeholder={form.productName ? `${form.productName} | Trademarco Global` : ""} />
               </FormField>
               <FormField label="SEO Description" hint="Defaults to the short description if left blank.">
                 <textarea style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} value={form.seoDescription} onChange={set("seoDescription")} />

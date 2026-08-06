@@ -12,7 +12,7 @@ const SECTIONS = [
     heading: "Essential Cookies",
     body: (
       <LegalP>
-        Essential cookies are strictly necessary for parts of the Website to function. On the TradeMarco website, this applies only to our internal admin system (<code style={{ background: COLORS.lightGray, padding: "2px 6px", borderRadius: 4, fontSize: 13 }}>/admin</code>), where an authentication session is required for authorized TradeMarco staff to log in and manage the product catalog. This cookie/session token is not set when you browse our public product catalog, manufacturer pages, or submit an RFQ, and it cannot be disabled without preventing staff from accessing the admin system.
+        Essential cookies are strictly necessary for parts of the Website to function. On the Trademarco Global website, this applies only to our internal admin system (<code style={{ background: COLORS.lightGray, padding: "2px 6px", borderRadius: 4, fontSize: 13 }}>/admin</code>), where an authentication session is required for authorized Company staff to log in and manage the product catalog. This cookie/session token is not set when you browse our public product catalog, manufacturer pages, or submit an RFQ, and it cannot be disabled without preventing staff from accessing the admin system.
       </LegalP>
     ),
   },
@@ -21,7 +21,7 @@ const SECTIONS = [
     heading: "Analytics Cookies",
     body: (
       <LegalP>
-        TradeMarco does not currently use analytics cookies (such as Google Analytics) or advertising/retargeting cookies on the public Website. Should we introduce analytics or advertising cookies in the future, we will update this Cookie Policy and, where required by applicable law, request your consent before any non-essential cookie is set.
+        The Company does not currently use analytics cookies (such as Google Analytics) or advertising/retargeting cookies on the public Website. Should we introduce analytics or advertising cookies in the future, we will update this Cookie Policy and, where required by applicable law, request your consent before any non-essential cookie is set.
       </LegalP>
     ),
   },
@@ -30,7 +30,7 @@ const SECTIONS = [
     heading: "Preference Cookies",
     body: (
       <LegalP>
-        Preference cookies are used to remember choices you make on a website, such as language or region settings. TradeMarco does not currently set any preference cookies on the public Website. If preference cookies are introduced in the future (for example, to remember a preferred region or unit of measurement), this Policy will be updated accordingly.
+        Preference cookies are used to remember choices you make on a website, such as language or region settings. The Company does not currently set any preference cookies on the public Website. If preference cookies are introduced in the future (for example, to remember a preferred region or unit of measurement), this Policy will be updated accordingly.
       </LegalP>
     ),
   },
@@ -61,7 +61,7 @@ const SECTIONS = [
     heading: "Third-Party Cookies",
     body: (
       <LegalP>
-        Our Website loads web fonts from Google Fonts. Loading a page may result in a request to Google&rsquo;s font-delivery servers, which is governed by Google&rsquo;s own privacy and cookie practices and is outside TradeMarco&rsquo;s control. We do not embed any advertising networks, social media widgets, or third-party tracking/retargeting scripts on the public Website. For more detail on the categories of information we process more broadly, see our <Link to="/privacy-policy" style={{ color: COLORS.orange, fontWeight: 600, textDecoration: "none" }}>Privacy Policy</Link>.
+        Our Website loads web fonts from Google Fonts. Loading a page may result in a request to Google&rsquo;s font-delivery servers, which is governed by Google&rsquo;s own privacy and cookie practices and is outside the Company&rsquo;s control. We do not embed any advertising networks, social media widgets, or third-party tracking/retargeting scripts on the public Website. For more detail on the categories of information we process more broadly, see our <Link to="/privacy-policy" style={{ color: COLORS.orange, fontWeight: 600, textDecoration: "none" }}>Privacy Policy</Link>.
       </LegalP>
     ),
   },
@@ -70,7 +70,7 @@ const SECTIONS = [
 export default function CookiePolicy() {
   useEffect(() => {
     setSEO({
-      title: "Cookie Policy | TradeMarco Global",
+      title: "Cookie Policy | Trademarco Global",
       description: "Learn what cookies Trademarco Global uses on its website — essential, analytics, preference and third-party cookies — and how to manage them.",
       path: "/cookie-policy",
     });
@@ -80,7 +80,7 @@ export default function CookiePolicy() {
     <LegalLayout
       eyebrow="Legal"
       title="Cookie Policy"
-      intro="This Cookie Policy explains what cookies TradeMarco LLC uses on this website, why we use them, and how you can manage your preferences."
+      intro="This Cookie Policy explains what cookies TRADEMARCO LLC uses on this website, why we use them, and how you can manage your preferences."
       lastUpdated={LAST_UPDATED}
       sections={SECTIONS}
     />

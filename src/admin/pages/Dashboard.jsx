@@ -27,7 +27,7 @@ function EmptyState({ text }) {
 }
 
 export default function Dashboard() {
-  useEffect(() => { document.title = "Dashboard | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "Dashboard | Trademarco Global Admin"; }, []);
 
   const [counts, setCounts] = useState(null);
   const [countsError, setCountsError] = useState("");
@@ -64,7 +64,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <PageHeader title="Dashboard" description="Overview of the TradeMarco catalog and RFQ pipeline — live from Supabase." />
+      <PageHeader title="Dashboard" description="Overview of the Trademarco Global catalog and RFQ pipeline — live from Supabase." />
 
       <div className="tm-admin-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 24 }}>
         {kpis.map((k) => (

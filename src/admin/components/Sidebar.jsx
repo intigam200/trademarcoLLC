@@ -23,7 +23,7 @@ export default function Sidebar({ mobileOpen, onClose }) {
           display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0,
         }}>
           <Link to="/admin" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <img src="/images/products/logo.png" alt="TradeMarco" style={{ height: 26, width: "auto" }} />
+            <img src="/images/products/logo.png" alt="Trademarco Global" style={{ height: 26, width: "auto" }} />
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>
               Admin
             </span>
@@ -59,7 +59,7 @@ export default function Sidebar({ mobileOpen, onClose }) {
         </nav>
 
         <div style={{ padding: "14px 20px", borderTop: `1px solid ${ADMIN_COLORS.sidebarBorder}`, fontSize: 11, color: "rgba(255,255,255,0.32)", flexShrink: 0 }}>
-          TradeMarco Admin &middot; Phase 1
+          Trademarco Global Admin &middot; Phase 1
         </div>
       </aside>
 

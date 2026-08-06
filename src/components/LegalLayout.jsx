@@ -107,7 +107,7 @@ export default function LegalLayout({ eyebrow, title, intro, lastUpdated, sectio
             <div style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, padding: "28px 32px", marginTop: 8 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, margin: "0 0 8px" }}>Questions about this policy?</h3>
               <p style={{ fontSize: 14, color: COLORS.medGray, margin: 0, lineHeight: 1.6 }}>
-                Contact TradeMarco LLC at{" "}
+                Contact TRADEMARCO LLC at{" "}
                 <a href="mailto:info@trademarco.com" style={{ color: COLORS.orange, fontWeight: 600, textDecoration: "none" }}>info@trademarco.com</a>
                 {" "}or{" "}
                 <a href="mailto:support@trademarco.com" style={{ color: COLORS.orange, fontWeight: 600, textDecoration: "none" }}>support@trademarco.com</a>.

@@ -11,14 +11,17 @@ import { ADMIN_COLORS } from "../theme";
 import { listRFQs, updateRFQ, deleteRFQ, rfqsToCSV } from "../../lib/supabase/rfqs";
 
 const STATUS_OPTIONS = [
-  { value: "unread", label: "Unread" },
+  { value: "unread", label: "New" },
   { value: "in_progress", label: "In Progress" },
   { value: "quoted", label: "Quoted" },
   { value: "closed", label: "Closed" },
 ];
 
 const COLUMNS = [
-  { key: "id", label: "RFQ ID", render: (row) => <span style={{ fontFamily: "monospace", fontSize: 12 }}>{row.id.slice(0, 8)}</span> },
+  {
+    key: "request_id", label: "Request ID",
+    render: (row) => <span style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 600, color: ADMIN_COLORS.navy }}>{row.request_id || row.id.slice(0, 8)}</span>,
+  },
   { key: "company", label: "Company", render: (row) => row.company || <span style={{ color: ADMIN_COLORS.medGray }}>—</span> },
   { key: "contact_name", label: "Contact" },
   { key: "email", label: "Email", wrap: true },
@@ -27,7 +30,10 @@ const COLUMNS = [
     render: (row) => row.product_label || <span style={{ color: ADMIN_COLORS.medGray }}>—</span>,
   },
   { key: "part_number", label: "Part Number", render: (row) => row.part_number || <span style={{ color: ADMIN_COLORS.medGray }}>—</span> },
-  { key: "created_at", label: "Date", render: (row) => new Date(row.created_at).toLocaleDateString() },
+  {
+    key: "created_at", label: "Submitted",
+    render: (row) => new Date(row.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+  },
   { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} /> },
 ];
 
@@ -41,7 +47,7 @@ function downloadBlob(blob, filename) {
 }
 
 export default function AdminRFQs() {
-  useEffect(() => { document.title = "RFQs | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "RFQs | Trademarco Global Admin"; }, []);
   const [rfqs, setRfqs] = useState(null);
   const [error, setError] = useState("");
   const [viewing, setViewing] = useState(null);
@@ -117,8 +123,8 @@ export default function AdminRFQs() {
         <DataTable
           columns={COLUMNS}
           rows={rfqs ?? []}
-          searchPlaceholder="Search by company, contact, email, product, part number…"
-          searchKeys={["company", "contact_name", "email", "product_label", "part_number", "id"]}
+          searchPlaceholder="Search by request ID, company, contact, email, product, part number…"
+          searchKeys={["request_id", "company", "contact_name", "email", "product_label", "part_number", "id"]}
           filters={[{ key: "status", label: "All Statuses", options: STATUS_OPTIONS }]}
           actions={(row) => <RowActions onView={() => openView(row)} onDelete={() => handleDelete(row)} />}
           emptyMessage="No RFQs yet — they'll appear here as visitors submit the RFQ form."
@@ -127,7 +133,7 @@ export default function AdminRFQs() {
 
       {viewing && (
         <Modal
-          title={`RFQ from ${viewing.contact_name}`}
+          title={`${viewing.request_id || `RFQ ${viewing.id.slice(0, 8)}`} — ${viewing.contact_name}`}
           onClose={() => setViewing(null)}
           footer={
             <>
@@ -139,7 +145,8 @@ export default function AdminRFQs() {
           }
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 13 }}>
-            <Row label="Submitted" value={new Date(viewing.created_at).toLocaleString()} />
+            <Row label="Request ID" value={viewing.request_id} />
+            <Row label="Submitted" value={new Date(viewing.created_at).toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })} />
             <Row label="Company" value={viewing.company} />
             <Row label="Contact" value={viewing.contact_name} />
             <Row label="Email" value={viewing.email} />

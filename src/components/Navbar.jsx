@@ -27,7 +27,7 @@ export default function Navbar() {
     }}>
       <div className="tm-navbar-inner" style={{ maxWidth: 1160, height: 97, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link to="/" style={{ display: "flex", alignItems: "center", cursor: "pointer", textDecoration: "none", marginRight: 32, flexShrink: 0 }}>
-          <img className="tm-navbar-logo" src="/images/products/logo.png" alt="TradeMarco Global" style={{ height: 56, width: "auto", display: "block" }} />
+          <img className="tm-navbar-logo" src="/images/products/logo.png" alt="Trademarco Global" style={{ height: 56, width: "auto", display: "block" }} />
         </Link>
 
         {/* Desktop */}

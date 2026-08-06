@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://trademarco.com/api/sitemap
+Sitemap: https://trademarco-llc.vercel.app/api/sitemap

@@ -41,13 +41,13 @@ export default function Products() {
   useEffect(() => {
     if (active) {
       setSEO({
-        title: active.seo_title || `${active.name} | Industrial Products | TradeMarco Global`,
+        title: active.seo_title || `${active.name} | Industrial Products | Trademarco Global`,
         description: active.seo_description || active.full_description || `Browse ${active.name} industrial products and equipment supplied by Trademarco Global. Request a quotation today.`,
         path: `/products?category=${active.slug}`,
       });
     } else if (!loading) {
       setSEO({
-        title: "Industrial Equipment & Components | TradeMarco Global",
+        title: "Industrial Equipment & Components | Trademarco Global",
         description: "Browse industrial equipment and components sourced from qualified manufacturers worldwide by Trademarco Global. Request a quotation today.",
         path: "/products",
       });
@@ -71,7 +71,7 @@ export default function Products() {
               Industrial Equipment &amp; Components
             </h1>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.7, margin: 0 }}>
-              From standard industrial equipment to hard-to-find components, TradeMarco helps customers source products from qualified manufacturers and suppliers worldwide.
+              From standard industrial equipment to hard-to-find components, Trademarco Global helps customers source products from qualified manufacturers and suppliers worldwide.
             </p>
           </div>
         </div>

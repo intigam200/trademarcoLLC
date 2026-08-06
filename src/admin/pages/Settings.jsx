@@ -69,11 +69,11 @@ function SeoPanel() {
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
           <label style={{ fontSize: 12, fontWeight: 600, color: ADMIN_COLORS.navy, display: "block", marginBottom: 6 }}>Default Site Title</label>
-          <input style={inputStyle} value="TradeMarco — Industrial Sourcing & Procurement" disabled />
+          <input style={inputStyle} value="Trademarco Global — Industrial Sourcing & Procurement" disabled />
         </div>
         <div>
           <label style={{ fontSize: 12, fontWeight: 600, color: ADMIN_COLORS.navy, display: "block", marginBottom: 6 }}>Default Meta Description</label>
-          <textarea style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} disabled defaultValue="TradeMarco LLC connects buyers with qualified industrial equipment manufacturers worldwide." />
+          <textarea style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} disabled defaultValue="Trademarco Global connects buyers with qualified industrial equipment manufacturers worldwide." />
         </div>
       </div>
       <ComingSoonNote>
@@ -156,7 +156,7 @@ function SecurityPanel() {
 const PANELS = { company: CompanyPanel, smtp: SmtpPanel, seo: SeoPanel, users: UsersPanel, security: SecurityPanel };
 
 export default function AdminSettings() {
-  useEffect(() => { document.title = "Settings | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "Settings | Trademarco Global Admin"; }, []);
   const [tab, setTab] = useState("company");
   const ActivePanel = PANELS[tab];
 

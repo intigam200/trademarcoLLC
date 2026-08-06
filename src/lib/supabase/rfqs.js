@@ -40,7 +40,7 @@ export async function countRFQs({ status } = {}) {
 // (see supabase/schema.sql), so a direct client-side insert would fail.
 
 const CSV_COLUMNS = [
-  ["id", "RFQ ID"], ["created_at", "Date"], ["status", "Status"],
+  ["request_id", "Request ID"], ["created_at", "Submitted"], ["status", "Status"],
   ["contact_name", "Contact Name"], ["company", "Company"], ["email", "Email"],
   ["phone", "Phone"], ["country", "Country"], ["manufacturer_name", "Manufacturer"],
   ["product_label", "Product"], ["part_number", "Part Number"], ["message", "Message"],

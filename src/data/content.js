@@ -77,7 +77,7 @@ export const ABOUT_FEATURES = [
 ];
 
 export const COMPANY_INFO = [
-  { label: "Legal Name", value: "TradeMarco LLC" },
+  { label: "Legal Name", value: "TRADEMARCO LLC" },
   { label: "Entity Type", value: "Limited Liability Company (LLC)" },
   { label: "State of Formation", value: "Wyoming, USA" },
   { label: "Formation Date", value: "July 23, 2026" },

@@ -16,7 +16,7 @@ export default function Manufacturers() {
 
   useEffect(() => {
     setSEO({
-      title: "Industrial Equipment Manufacturers | TradeMarco Global",
+      title: "Industrial Equipment Manufacturers | Trademarco Global",
       description: "Browse industrial equipment manufacturers and brands sourced by Trademarco Global — automation, valves, instrumentation, electrical equipment and more.",
       path: "/manufacturers",
     });
@@ -43,7 +43,7 @@ export default function Manufacturers() {
               Industrial Manufacturers
             </h1>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.7, margin: "0 0 36px" }}>
-              Explore the world&rsquo;s leading manufacturers of industrial valves, instrumentation, automation, filtration, sealing solutions and process equipment supplied by TradeMarco.
+              Explore the world&rsquo;s leading manufacturers of industrial valves, instrumentation, automation, filtration, sealing solutions and process equipment supplied by Trademarco Global.
             </p>
             <Button as="a" href="/#contact" variant="primary">
               Request a Quote <Icon type="arrow-right" size={18} color={COLORS.white} />
@@ -114,7 +114,7 @@ export default function Manufacturers() {
         )}
 
         <p style={{ fontSize: 12, color: COLORS.medGray, lineHeight: 1.6, margin: "40px 0 0", fontStyle: "italic" }}>
-          All manufacturer names, trademarks and logos are the property of their respective owners. TradeMarco LLC is an independent industrial sourcing company and is not an authorized distributor or representative of the manufacturers listed unless otherwise stated.
+          All manufacturer names, trademarks and logos are the property of their respective owners. TRADEMARCO LLC is an independent industrial sourcing company and is not an authorized distributor or representative of the manufacturers listed unless otherwise stated.
         </p>
 
         <style>{`

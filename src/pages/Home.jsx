@@ -288,11 +288,11 @@ export default function Home() {
         `}</style>
       </section>
 
-      {/* ── WHY TRADEMARCO ── */}
+      {/* ── WHY TRADEMARCO GLOBAL ── */}
       <Section id="why" bg={COLORS.white}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 64, alignItems: "start" }}>
           <div>
-            <SectionLabel>Why TradeMarco</SectionLabel>
+            <SectionLabel>Why Trademarco Global</SectionLabel>
             <SectionTitle>Your Sourcing Partner<br />for Industrial Projects</SectionTitle>
             <SectionDesc>
               We eliminate the complexity of international procurement. You tell us what you need — we find the right manufacturer, negotiate the best price, and deliver to your door.
@@ -377,13 +377,13 @@ export default function Home() {
           <div className="tm-about-grid" style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 64, alignItems: "start" }}>
             {/* LEFT */}
             <div>
-              <SectionLabel>About TradeMarco</SectionLabel>
+              <SectionLabel>About Trademarco Global</SectionLabel>
               <h2 style={{ fontSize: "clamp(28px, 3.6vw, 40px)", fontWeight: 800, color: COLORS.navy, margin: 0, lineHeight: 1.15, letterSpacing: "-0.01em" }}>
                 An American Company with Global Reach
               </h2>
               <div style={{ width: 60, height: 3, background: COLORS.orange, margin: "24px 0" }} />
               <p style={{ fontSize: 16, lineHeight: 1.75, color: "#5A5F6B", margin: "0 0 20px" }}>
-                TradeMarco LLC is registered in Wyoming, USA. We specialize in international procurement of industrial equipment, connecting buyers with verified manufacturers worldwide.
+                TRADEMARCO LLC is registered in Wyoming, USA. We specialize in international procurement of industrial equipment, connecting buyers with verified manufacturers worldwide.
               </p>
               <p style={{ fontSize: 16, lineHeight: 1.75, color: "#5A5F6B", margin: "0 0 40px" }}>
                 We are not a manufacturer. Our value is in sourcing the right products at the right price, managing quality control, and ensuring reliable delivery to any destination.

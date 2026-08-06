@@ -13,17 +13,17 @@ const SECTIONS = [
     body: (
       <>
         <LegalP>
-          TradeMarco LLC (&ldquo;TradeMarco,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) collects information in the following ways:
+          TRADEMARCO LLC (&ldquo;the Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) collects information in the following ways:
         </LegalP>
         <LegalList
           items={[
             <><strong>Information you provide directly</strong> — when you submit a Request for Quotation (RFQ) or contact form, we collect your full name, email address, company name, phone number, country or delivery destination, the product(s) you are inquiring about, and the content of your message.</>,
             <><strong>Information collected automatically</strong> — like most websites, our hosting infrastructure automatically logs technical data such as IP address, browser type and version, device and operating system, pages visited, referring URL, and timestamps. This data is collected at the server/hosting level for security, abuse prevention and performance monitoring.</>,
-            <><strong>Administrative account information</strong> — TradeMarco staff who manage our product catalog use an internal login (email and password) to access our admin system. This applies only to authorized TradeMarco personnel, not to public website visitors.</>,
+            <><strong>Administrative account information</strong> — Company staff who manage our product catalog use an internal login (email and password) to access our admin system. This applies only to authorized Company personnel, not to public website visitors.</>,
           ]}
         />
         <LegalP>
-          We do not collect payment card details, banking information, or other financial account information through this website. TradeMarco operates on a request-for-quotation basis; any commercial payment terms are agreed separately, outside of this website.
+          We do not collect payment card details, banking information, or other financial account information through this website. The Company operates on a request-for-quotation basis; any commercial payment terms are agreed separately, outside of this website.
         </LegalP>
       </>
     ),
@@ -50,7 +50,7 @@ const SECTIONS = [
     body: (
       <>
         <LegalP>
-          Where applicable data protection law (such as the EU/UK General Data Protection Regulation) requires a legal basis for processing, TradeMarco relies on one or more of the following:
+          Where applicable data protection law (such as the EU/UK General Data Protection Regulation) requires a legal basis for processing, the Company relies on one or more of the following:
         </LegalP>
         <LegalList
           items={[
@@ -68,7 +68,7 @@ const SECTIONS = [
     heading: "Cookies",
     body: (
       <LegalP>
-        Our website uses a limited number of cookies. Strictly necessary cookies are used to support the login session for authorized TradeMarco staff accessing the internal admin system; these are not set for members of the public browsing our product catalog. We do not currently use cookies for advertising or cross-site tracking. For full detail on the categories of cookies we use and how to manage them, see our <Link to="/cookie-policy" style={{ color: COLORS.orange, fontWeight: 600, textDecoration: "none" }}>Cookie Policy</Link>.
+        Our website uses a limited number of cookies. Strictly necessary cookies are used to support the login session for authorized Company staff accessing the internal admin system; these are not set for members of the public browsing our product catalog. We do not currently use cookies for advertising or cross-site tracking. For full detail on the categories of cookies we use and how to manage them, see our <Link to="/cookie-policy" style={{ color: COLORS.orange, fontWeight: 600, textDecoration: "none" }}>Cookie Policy</Link>.
       </LegalP>
     ),
   },
@@ -77,7 +77,7 @@ const SECTIONS = [
     heading: "Analytics",
     body: (
       <LegalP>
-        TradeMarco does not currently deploy third-party analytics or advertising trackers (such as Google Analytics or social media pixels) on the public website. Our hosting provider may retain aggregate, anonymized server access logs for security and performance purposes. If we introduce analytics tools in the future, we will update this Privacy Policy and, where required by law, request your consent before doing so.
+        The Company does not currently deploy third-party analytics or advertising trackers (such as Google Analytics or social media pixels) on the public website. Our hosting provider may retain aggregate, anonymized server access logs for security and performance purposes. If we introduce analytics tools in the future, we will update this Privacy Policy and, where required by law, request your consent before doing so.
       </LegalP>
     ),
   },
@@ -86,7 +86,7 @@ const SECTIONS = [
     heading: "RFQ Forms",
     body: (
       <LegalP>
-        When you submit a Request for Quotation, the information you provide (name, email, company, phone number, country/delivery destination, product reference, and your message) is transmitted securely and stored in our database, hosted by our infrastructure provider, Supabase. This information is used exclusively to review your requirements, prepare a competitive quotation, and communicate with you about your request. RFQ data is accessible only to authorized TradeMarco personnel.
+        When you submit a Request for Quotation, the information you provide (name, email, company, phone number, country/delivery destination, product reference, and your message) is transmitted securely and stored in our database, hosted by our infrastructure provider, Supabase. This information is used exclusively to review your requirements, prepare a competitive quotation, and communicate with you about your request. RFQ data is accessible only to authorized Company personnel.
       </LegalP>
     ),
   },
@@ -135,7 +135,7 @@ const SECTIONS = [
           items={[
             "Encryption of data in transit via HTTPS/TLS across the entire website.",
             "Database-level access controls (row-level security) restricting data access to authorized systems and personnel only.",
-            "Restricted administrative access — the internal admin system is available only to authenticated TradeMarco staff and is not open to public registration.",
+            "Restricted administrative access — the internal admin system is available only to authenticated Company staff and is not open to public registration.",
             "No storage of sensitive credentials or secrets in the browser.",
           ]}
         />
@@ -148,7 +148,7 @@ const SECTIONS = [
     heading: "International Data Transfers",
     body: (
       <LegalP>
-        TradeMarco LLC is registered and based in the United States. Because we serve customers worldwide, information you submit may be transferred to, stored, and processed in the United States and other countries where our service providers operate, which may have data protection laws different from those of your home jurisdiction. Where required by applicable law (for example, transfers of personal data originating in the European Economic Area or United Kingdom), we rely on appropriate safeguards, such as standard contractual clauses, offered by our service providers.
+        TRADEMARCO LLC is registered and based in the United States. Because we serve customers worldwide, information you submit may be transferred to, stored, and processed in the United States and other countries where our service providers operate, which may have data protection laws different from those of your home jurisdiction. Where required by applicable law (for example, transfers of personal data originating in the European Economic Area or United Kingdom), we rely on appropriate safeguards, such as standard contractual clauses, offered by our service providers.
       </LegalP>
     ),
   },
@@ -190,7 +190,7 @@ const SECTIONS = [
     body: (
       <LegalP>
         Questions or requests regarding this Privacy Policy can be directed to:<br /><br />
-        <strong style={{ color: COLORS.navy }}>TradeMarco LLC</strong><br />
+        <strong style={{ color: COLORS.navy }}>TRADEMARCO LLC</strong><br />
         30 N Gould St Ste N, Sheridan, WY 82801, USA<br />
         Email: <a href="mailto:info@trademarco.com" style={{ color: COLORS.orange, textDecoration: "none", fontWeight: 600 }}>info@trademarco.com</a> · <a href="mailto:support@trademarco.com" style={{ color: COLORS.orange, textDecoration: "none", fontWeight: 600 }}>support@trademarco.com</a><br />
         Phone: +1 (307) 999-8667
@@ -211,7 +211,7 @@ const SECTIONS = [
 export default function PrivacyPolicy() {
   useEffect(() => {
     setSEO({
-      title: "Privacy Policy | TradeMarco Global",
+      title: "Privacy Policy | Trademarco Global",
       description: "Learn how Trademarco Global collects, uses and protects your information when you submit RFQ or contact inquiries on our industrial sourcing website.",
       path: "/privacy-policy",
     });
@@ -221,7 +221,7 @@ export default function PrivacyPolicy() {
     <LegalLayout
       eyebrow="Legal"
       title="Privacy Policy"
-      intro="This Privacy Policy explains how TradeMarco LLC collects, uses, and protects information when you use our website and submit RFQ or contact inquiries."
+      intro="This Privacy Policy explains how TRADEMARCO LLC collects, uses, and protects information when you use our website and submit RFQ or contact inquiries."
       lastUpdated={LAST_UPDATED}
       sections={SECTIONS}
     />

@@ -137,7 +137,7 @@ export default function Company() {
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
           <SectionLabel>What We Do</SectionLabel>
           <p style={{ fontSize: "clamp(18px, 2.2vw, 23px)", fontWeight: 500, color: "rgba(255,255,255,0.9)", lineHeight: 1.6, margin: 0 }}>
-            TRADEMARCO connects industrial buyers with manufacturers and suppliers worldwide, supporting sourcing, procurement and supply coordination for industrial equipment and components.
+            Trademarco Global connects industrial buyers with manufacturers and suppliers worldwide, supporting sourcing, procurement and supply coordination for industrial equipment and components.
           </p>
         </div>
       </section>

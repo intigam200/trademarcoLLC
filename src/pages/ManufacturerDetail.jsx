@@ -36,13 +36,13 @@ export default function ManufacturerDetail() {
   useEffect(() => {
     if (manufacturer) {
       setSEO({
-        title: manufacturer.seo_title || `${manufacturer.name} Industrial Products | TradeMarco Global`,
+        title: manufacturer.seo_title || `${manufacturer.name} Industrial Products | Trademarco Global`,
         description: manufacturer.seo_description || manufacturer.description || `Explore ${manufacturer.name} industrial products supplied worldwide by Trademarco Global.`,
         image: manufacturer.logo_url || undefined,
         path: `/manufacturers/${manufacturer.slug}`,
       });
     } else if (status === "not-found") {
-      setNoIndexSEO("Manufacturer Not Found | TradeMarco Global");
+      setNoIndexSEO("Manufacturer Not Found | Trademarco Global");
     }
   }, [manufacturer, status]);
 

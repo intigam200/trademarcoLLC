@@ -97,7 +97,7 @@ function StatTile({ count, label, color, bg }) {
 }
 
 export default function AdminImport() {
-  useEffect(() => { document.title = "Import Center | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "Import Center | Trademarco Global Admin"; }, []);
 
   const [step, setStep] = useState("upload"); // upload | map | review | done
   const [fileName, setFileName] = useState("");

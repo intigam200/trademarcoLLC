@@ -26,7 +26,7 @@ const COLUMNS = [
 const EMPTY_FORM = { name: "", description: "", website: "", logo_url: "", seo_title: "", seo_description: "", status: "active" };
 
 export default function AdminManufacturers() {
-  useEffect(() => { document.title = "Manufacturers | TradeMarco Admin"; }, []);
+  useEffect(() => { document.title = "Manufacturers | Trademarco Global Admin"; }, []);
   const [rows, setRows] = useState(null);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -87,7 +87,7 @@ export default function AdminManufacturers() {
     <div>
       <PageHeader
         title="Manufacturers"
-        description="Brands sourced through TradeMarco. Feeds the public Manufacturers page directly from Supabase."
+        description="Brands sourced through Trademarco Global. Feeds the public Manufacturers page directly from Supabase."
         actions={
           <Button variant="primary" onClick={openAdd} style={{ padding: "10px 20px", fontSize: 13 }}>
             <Icon type="plus" size={16} color={ADMIN_COLORS.white} /> Add Manufacturer
