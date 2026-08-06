@@ -28,7 +28,7 @@ export const ADMIN_NAV_ITEMS = [
   { label: "Products", to: "/admin/products", icon: "box" },
   { label: "Manufacturers", to: "/admin/manufacturers", icon: "factory" },
   { label: "Categories", to: "/admin/categories", icon: "clipboard" },
-  { label: "Import", to: "/admin/import", icon: "upload" },
+  { label: "Import Center", to: "/admin/import", icon: "upload" },
   { label: "RFQs", to: "/admin/rfqs", icon: "mail" },
   { label: "Settings", to: "/admin/settings", icon: "gear" },
 ];

@@ -11,13 +11,15 @@
     "import:products": "node scripts/import-products.mjs"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "jsonwebtoken": "^9.0.3",
+    "@supabase/supabase-js": "^2.78.0",
     "nodemailer": "^9.0.3",
+    "pdfjs-dist": "^4.8.69",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.7.0",
-    "react-router-dom": "^6.30.4"
+    "react-router-dom": "^6.30.4",
+    "validator": "^13.15.35",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -29,6 +31,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
+    "vercel": "^58.4.4",
     "vite": "^5.4.10"
   }
 }

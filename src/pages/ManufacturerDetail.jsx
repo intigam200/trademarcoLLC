@@ -1,22 +1,60 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
-import { MANUFACTURERS } from "../data/content";
+import { getManufacturerBySlug } from "../lib/supabase/manufacturers";
+import { listProducts } from "../lib/supabase/products";
+import { setSEO, setNoIndexSEO } from "../lib/seo";
 import { Section } from "../components/Section";
+import LoadingState from "../components/LoadingState";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 
 export default function ManufacturerDetail() {
   const { slug } = useParams();
-  const manufacturer = MANUFACTURERS.find((m) => m.slug === slug);
+  const [state, setState] = useState({ status: "loading", manufacturer: null, products: [] });
 
   useEffect(() => {
-    document.title = manufacturer
-      ? `${manufacturer.name} | TradeMarco Manufacturers`
-      : "Manufacturer Not Found | TradeMarco";
-  }, [manufacturer]);
+    let cancelled = false;
+    setState({ status: "loading", manufacturer: null, products: [] });
+    getManufacturerBySlug(slug)
+      .then(async (manufacturer) => {
+        if (cancelled) return;
+        if (!manufacturer) {
+          setState({ status: "not-found", manufacturer: null, products: [] });
+          return;
+        }
+        const products = await listProducts({ manufacturerId: manufacturer.id, status: "published" });
+        if (cancelled) return;
+        setState({ status: "ready", manufacturer, products });
+      })
+      .catch(() => { if (!cancelled) setState({ status: "not-found", manufacturer: null, products: [] }); });
+    return () => { cancelled = true; };
+  }, [slug]);
 
-  if (!manufacturer) {
+  const { status, manufacturer, products } = state;
+
+  useEffect(() => {
+    if (manufacturer) {
+      setSEO({
+        title: manufacturer.seo_title || `${manufacturer.name} Industrial Products | TradeMarco Global`,
+        description: manufacturer.seo_description || manufacturer.description || `Explore ${manufacturer.name} industrial products supplied worldwide by Trademarco Global.`,
+        image: manufacturer.logo_url || undefined,
+        path: `/manufacturers/${manufacturer.slug}`,
+      });
+    } else if (status === "not-found") {
+      setNoIndexSEO("Manufacturer Not Found | TradeMarco Global");
+    }
+  }, [manufacturer, status]);
+
+  if (status === "loading") {
+    return (
+      <Section bg={COLORS.white}>
+        <LoadingState label="Loading manufacturer…" minHeight={400} />
+      </Section>
+    );
+  }
+
+  if (status === "not-found") {
     return (
       <Section bg={COLORS.white}>
         <div style={{ maxWidth: 560, margin: "80px auto", textAlign: "center" }}>
@@ -49,7 +87,7 @@ export default function ManufacturerDetail() {
               {manufacturer.name}
             </h1>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.7, margin: 0 }}>
-              {manufacturer.desc}
+              {manufacturer.description}
             </p>
           </div>
         </div>
@@ -66,39 +104,71 @@ export default function ManufacturerDetail() {
         </div>
       </div>
 
-      {/* ── COMING SOON ── */}
-      <Section bg={COLORS.white}>
-        <div style={{
-          maxWidth: 620, margin: "0 auto", textAlign: "center",
-          background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, padding: "48px 32px",
-        }}>
-          {manufacturer.logo && (
-            <div style={{
-              height: 56, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 28,
-              background: manufacturer.logoDark ? COLORS.navy : "transparent",
-              borderRadius: manufacturer.logoDark ? 8 : 0,
-              padding: manufacturer.logoDark ? "10px 18px" : 0,
-              width: "fit-content", margin: "0 auto 28px",
-            }}>
-              <img src={manufacturer.logo} alt={`${manufacturer.name} logo`} style={{ maxWidth: 180, maxHeight: manufacturer.logoDark ? 36 : "100%", objectFit: "contain" }} />
-            </div>
-          )}
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: COLORS.navy, margin: "0 0 12px" }}>
-            Full {manufacturer.name} Product Profile Coming Soon
-          </h2>
-          <p style={{ fontSize: 15, lineHeight: 1.7, color: COLORS.medGray, margin: "0 0 28px" }}>
-            We&rsquo;re building out detailed sourcing information for {manufacturer.name}. In the meantime, send us your requirements and our team will help identify suitable {manufacturer.name} products and sourcing options.
-          </p>
-          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-            <Button as="a" href="/#contact" variant="primary">
-              Request a Quote <Icon type="arrow-right" size={18} color={COLORS.white} />
-            </Button>
-            <Button as={Link} to="/manufacturers" variant="outline">
-              View All Manufacturers
-            </Button>
+      {products.length > 0 ? (
+        /* ── PRODUCTS GRID ── */
+        <Section bg={COLORS.lightGray}>
+          <div className="tm-mfr-products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 24 }}>
+            {products.map((p) => (
+              <Link key={p.id} to={`/manufacturers/${manufacturer.slug}/${p.slug}`} className="tm-mfr-product-card" style={{
+                display: "flex", flexDirection: "column", background: COLORS.white,
+                border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, overflow: "hidden", textDecoration: "none",
+              }}>
+                {p.image_url && (
+                  <div style={{ height: 160, background: COLORS.lightGray, borderBottom: `1px solid ${COLORS.borderGray}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <img src={p.image_url} alt={p.product_name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                  </div>
+                )}
+                <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: 24 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: COLORS.medGray, marginBottom: 8 }}>{p.part_number}</div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, margin: "0 0 8px" }}>{p.product_name}</h3>
+                <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: "0 0 16px", flexGrow: 1 }}>{p.short_description}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: COLORS.orange }}>
+                  View Product <Icon type="arrow-right" size={14} color={COLORS.orange} />
+                </div>
+                </div>
+              </Link>
+            ))}
           </div>
-        </div>
-      </Section>
+          <style>{`
+            .tm-mfr-product-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+            .tm-mfr-product-card:hover { box-shadow: 0 10px 25px rgba(27,42,74,0.12); transform: translateY(-4px); }
+          `}</style>
+        </Section>
+      ) : (
+        /* ── COMING SOON ── */
+        <Section bg={COLORS.white}>
+          <div style={{
+            maxWidth: 620, margin: "0 auto", textAlign: "center",
+            background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, padding: "48px 32px",
+          }}>
+            {manufacturer.logo_url && (
+              <div style={{
+                height: 56, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 28,
+                background: manufacturer.logo_dark ? COLORS.navy : "transparent",
+                borderRadius: manufacturer.logo_dark ? 8 : 0,
+                padding: manufacturer.logo_dark ? "10px 18px" : 0,
+                width: "fit-content", margin: "0 auto 28px",
+              }}>
+                <img src={manufacturer.logo_url} alt={`${manufacturer.name} logo`} style={{ maxWidth: 180, maxHeight: manufacturer.logo_dark ? 36 : "100%", objectFit: "contain" }} />
+              </div>
+            )}
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: COLORS.navy, margin: "0 0 12px" }}>
+              Full {manufacturer.name} Product Profile Coming Soon
+            </h2>
+            <p style={{ fontSize: 15, lineHeight: 1.7, color: COLORS.medGray, margin: "0 0 28px" }}>
+              We&rsquo;re building out detailed sourcing information for {manufacturer.name}. In the meantime, send us your requirements and our team will help identify suitable {manufacturer.name} products and sourcing options.
+            </p>
+            <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+              <Button as="a" href="/#contact" variant="primary">
+                Request a Quote <Icon type="arrow-right" size={18} color={COLORS.white} />
+              </Button>
+              <Button as={Link} to="/manufacturers" variant="outline">
+                View All Manufacturers
+              </Button>
+            </div>
+          </div>
+        </Section>
+      )}
     </>
   );
 }

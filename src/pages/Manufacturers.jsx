@@ -1,14 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
-import { MANUFACTURERS, OEM_FEATURES } from "../data/content";
+import { OEM_FEATURES } from "../data/content";
+import { listManufacturers } from "../lib/supabase/manufacturers";
+import { setSEO } from "../lib/seo";
 import { Section, SectionLabel, SectionTitle } from "../components/Section";
+import LoadingState from "../components/LoadingState";
+import EmptyState from "../components/EmptyState";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 
 export default function Manufacturers() {
+  const [manufacturers, setManufacturers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    document.title = "Industrial Manufacturers | TradeMarco";
+    setSEO({
+      title: "Industrial Equipment Manufacturers | TradeMarco Global",
+      description: "Browse industrial equipment manufacturers and brands sourced by Trademarco Global — automation, valves, instrumentation, electrical equipment and more.",
+      path: "/manufacturers",
+    });
+    listManufacturers({ status: "active" })
+      .then(setManufacturers)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -50,10 +65,15 @@ export default function Manufacturers() {
       <Section bg={COLORS.lightGray}>
         <SectionLabel>Brands We Source</SectionLabel>
         <SectionTitle>Manufacturers</SectionTitle>
+        {loading ? (
+          <LoadingState label="Loading manufacturers…" />
+        ) : manufacturers.length === 0 ? (
+          <EmptyState icon="factory" title="No manufacturers yet" description="Manufacturers will appear here once they're published." />
+        ) : (
         <div className="tm-mfr-grid" style={{
           display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 24, marginTop: 40,
         }}>
-          {MANUFACTURERS.map((m) => (
+          {manufacturers.map((m) => (
             <Link key={m.slug} to={`/manufacturers/${m.slug}`} className="tm-mfr-card" style={{
               display: "flex", flexDirection: "column", height: "100%",
               background: COLORS.white, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10,
@@ -63,14 +83,14 @@ export default function Manufacturers() {
                 height: 64, display: "flex", alignItems: "center", justifyContent: "flex-start",
                 marginBottom: 20, flexShrink: 0,
               }}>
-                {m.logo ? (
+                {m.logo_url ? (
                   <div style={{
                     height: "100%", display: "flex", alignItems: "center", justifyContent: "center",
-                    background: m.logoDark ? COLORS.navy : "transparent",
-                    borderRadius: m.logoDark ? 8 : 0,
-                    padding: m.logoDark ? "8px 14px" : 0,
+                    background: m.logo_dark ? COLORS.navy : "transparent",
+                    borderRadius: m.logo_dark ? 8 : 0,
+                    padding: m.logo_dark ? "8px 14px" : 0,
                   }}>
-                    <img src={m.logo} alt={`${m.name} logo`} style={{ maxWidth: 140, maxHeight: m.logoDark ? 40 : "100%", objectFit: "contain" }} />
+                    <img src={m.logo_url} alt={`${m.name} logo`} style={{ maxWidth: 140, maxHeight: m.logo_dark ? 40 : "100%", objectFit: "contain" }} />
                   </div>
                 ) : (
                   <div style={{
@@ -83,7 +103,7 @@ export default function Manufacturers() {
                 )}
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: COLORS.navy, margin: "0 0 8px" }}>{m.name}</h3>
-              <p style={{ fontSize: 14, lineHeight: 1.6, color: COLORS.medGray, margin: "0 0 20px", flexGrow: 1 }}>{m.desc}</p>
+              <p style={{ fontSize: 14, lineHeight: 1.6, color: COLORS.medGray, margin: "0 0 20px", flexGrow: 1 }}>{m.description}</p>
               <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600, color: COLORS.orange }}>
                 View Manufacturer
                 <Icon type="arrow-right" size={16} color={COLORS.orange} className="tm-mfr-arrow" />
@@ -91,6 +111,7 @@ export default function Manufacturers() {
             </Link>
           ))}
         </div>
+        )}
 
         <p style={{ fontSize: 12, color: COLORS.medGray, lineHeight: 1.6, margin: "40px 0 0", fontStyle: "italic" }}>
           All manufacturer names, trademarks and logos are the property of their respective owners. TradeMarco LLC is an independent industrial sourcing company and is not an authorized distributor or representative of the manufacturers listed unless otherwise stated.

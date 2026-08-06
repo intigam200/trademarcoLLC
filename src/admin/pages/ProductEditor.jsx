@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MANUFACTURERS, PRODUCTS as CATEGORIES } from "../../data/content";
+import { listManufacturers } from "../../lib/supabase/manufacturers";
+import { listCategories } from "../../lib/supabase/categories";
+import {
+  getProduct, getRelatedProductRefs, createProduct, updateProduct,
+  resolveProductRef, setRelatedProducts,
+} from "../../lib/supabase/products";
+import { uploadProductImage, uploadDatasheet } from "../../lib/supabase/storage";
 import { slugify } from "../../data/catalog/schema";
 import { ADMIN_COLORS } from "../theme";
 import PageHeader from "../components/PageHeader";
@@ -10,38 +16,179 @@ import TagInput from "../components/TagInput";
 import Icon from "../../components/Icon";
 import Button from "../../components/Button";
 
-const EMPTY_PRODUCT = {
-  manufacturer: "", category: "", series: "", partNumber: "", productName: "",
+const EMPTY_FORM = {
+  manufacturerId: "", categoryId: "", series: "", partNumber: "", productName: "",
+  price: "", size: "", rating: "", type: "",
   shortDescription: "", longDescription: "", applications: [], industries: [],
-  alternativePartNumbers: [], relatedProducts: [], status: "draft",
-  seoTitle: "", seoDescription: "",
+  alternativePartNumbers: [], relatedProducts: [], rfqAvailable: true,
+  imageUrl: "", datasheetUrl: "", status: "draft", seoTitle: "", seoDescription: "",
 };
 
 export default function ProductEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
-  const [form, setForm] = useState(EMPTY_PRODUCT);
-  const [datasheetName, setDatasheetName] = useState("");
+
+  const [manufacturers, setManufacturers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [loading, setLoading] = useState(isEditing);
+  const [loadError, setLoadError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingDatasheet, setUploadingDatasheet] = useState(false);
 
   useEffect(() => {
     document.title = `${isEditing ? "Edit" : "Add"} Product | TradeMarco Admin`;
   }, [isEditing]);
 
+  useEffect(() => {
+    listManufacturers().then(setManufacturers).catch(() => {});
+    listCategories().then(setCategories).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    let cancelled = false;
+    setLoading(true);
+    setLoadError("");
+    Promise.all([getProduct(id), getRelatedProductRefs(id)])
+      .then(([product, relatedRefs]) => {
+        if (cancelled) return;
+        if (!product) {
+          setLoadError("Product not found.");
+          return;
+        }
+        setForm({
+          manufacturerId: product.manufacturer_id,
+          categoryId: product.category_id,
+          series: product.series ?? "",
+          partNumber: product.part_number,
+          price: product.price ?? "",
+          size: product.size ?? "",
+          rating: product.rating ?? "",
+          type: product.type ?? "",
+          productName: product.product_name,
+          shortDescription: product.short_description,
+          longDescription: product.long_description ?? "",
+          applications: product.applications ?? [],
+          industries: product.industries ?? [],
+          alternativePartNumbers: product.alternative_part_numbers ?? [],
+          relatedProducts: relatedRefs,
+          rfqAvailable: product.rfq_available,
+          imageUrl: product.image_url ?? "",
+          datasheetUrl: product.datasheet_url ?? "",
+          status: product.status,
+          seoTitle: product.seo_title ?? "",
+          seoDescription: product.seo_description ?? "",
+        });
+      })
+      .catch((err) => { if (!cancelled) setLoadError(err.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [id, isEditing]);
+
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const slug = useMemo(() => slugify(form.partNumber), [form.partNumber]);
-  const previewUrl = form.manufacturer && slug ? `/manufacturers/${form.manufacturer}/${slug}` : null;
+  const selectedManufacturer = manufacturers.find((m) => m.id === form.manufacturerId);
+  const previewUrl = selectedManufacturer && slug ? `/manufacturers/${selectedManufacturer.slug}/${slug}` : null;
 
-  const handleSave = (status) => {
-    // Phase 1 has no database — this validates and previews the record
-    // shape a future POST /api/admin/products would receive.
-    setForm((f) => ({ ...f, status }));
-    setSaveMessage(status === "published"
-      ? "Marked as Published (preview only — connect a database in Phase 2 to persist it)."
-      : "Draft saved locally (preview only — connect a database in Phase 2 to persist it).");
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadProductImage(file);
+      setForm((f) => ({ ...f, imageUrl: url }));
+    } catch (err) {
+      window.alert(`Image upload failed: ${err.message}`);
+    } finally {
+      setUploadingImage(false);
+    }
   };
+
+  const handleDatasheetUpload = async (file) => {
+    if (!file) return;
+    setUploadingDatasheet(true);
+    try {
+      const url = await uploadDatasheet(file);
+      setForm((f) => ({ ...f, datasheetUrl: url }));
+    } catch (err) {
+      window.alert(`Datasheet upload failed: ${err.message}`);
+    } finally {
+      setUploadingDatasheet(false);
+    }
+  };
+
+  const handleSave = async (status) => {
+    setSaveError("");
+    setSaveMessage("");
+
+    if (!form.manufacturerId || !form.categoryId || !form.partNumber.trim() || !form.productName.trim() || !form.shortDescription.trim()) {
+      setSaveError("Manufacturer, Category, Part Number, Product Name and Short Description are required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = {
+        manufacturer_id: form.manufacturerId,
+        category_id: form.categoryId,
+        series: form.series.trim() || null,
+        slug,
+        part_number: form.partNumber.trim(),
+        price: form.price !== "" && !Number.isNaN(Number(form.price)) ? Number(form.price) : null,
+        size: form.size.trim() || null,
+        rating: form.rating.trim() || null,
+        type: form.type.trim() || null,
+        product_name: form.productName.trim(),
+        short_description: form.shortDescription.trim(),
+        long_description: form.longDescription.trim() || null,
+        applications: form.applications,
+        industries: form.industries,
+        alternative_part_numbers: form.alternativePartNumbers,
+        rfq_available: form.rfqAvailable,
+        image_url: form.imageUrl || null,
+        datasheet_url: form.datasheetUrl || null,
+        seo_title: form.seoTitle.trim() || null,
+        seo_description: form.seoDescription.trim() || null,
+        status,
+      };
+
+      const saved = isEditing ? await updateProduct(id, payload) : await createProduct(payload);
+
+      const relatedIds = (await Promise.all(form.relatedProducts.map(resolveProductRef))).filter(Boolean);
+      await setRelatedProducts(saved.id, relatedIds);
+
+      setForm((f) => ({ ...f, status }));
+      setSaveMessage(status === "published" ? "Product published — now live on the public site." : "Draft saved.");
+
+      if (!isEditing) {
+        navigate(`/admin/products/${saved.id}/edit`, { replace: true });
+      }
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div style={{ padding: "60px 0", textAlign: "center", color: ADMIN_COLORS.medGray, fontSize: 13 }}>Loading product&hellip;</div>;
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ maxWidth: 480, margin: "60px auto", textAlign: "center" }}>
+        <p style={{ fontSize: 14, color: ADMIN_COLORS.danger, marginBottom: 20 }}>{loadError}</p>
+        <Button variant="outline" onClick={() => navigate("/admin/products")} style={{ padding: "10px 18px", fontSize: 13 }}>
+          Back to Products
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -61,21 +208,27 @@ export default function ProductEditor() {
           {saveMessage}
         </div>
       )}
+      {saveError && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: ADMIN_COLORS.danger, background: ADMIN_COLORS.dangerBg, padding: "10px 14px", borderRadius: 6, marginBottom: 20 }}>
+          <Icon type="alert-triangle" size={15} color={ADMIN_COLORS.danger} />
+          {saveError}
+        </div>
+      )}
 
       <div className="tm-pe-grid" style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 24, alignItems: "start" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <AdminCard title="Identification">
             <div className="tm-pe-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <FormField label="Manufacturer" required>
-                <select style={inputStyle} value={form.manufacturer} onChange={set("manufacturer")}>
+                <select style={inputStyle} value={form.manufacturerId} onChange={set("manufacturerId")}>
                   <option value="">Select manufacturer…</option>
-                  {MANUFACTURERS.map((m) => <option key={m.slug} value={m.slug}>{m.name}</option>)}
+                  {manufacturers.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                 </select>
               </FormField>
               <FormField label="Category" required>
-                <select style={inputStyle} value={form.category} onChange={set("category")}>
+                <select style={inputStyle} value={form.categoryId} onChange={set("categoryId")}>
                   <option value="">Select category…</option>
-                  {CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.title}</option>)}
+                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </FormField>
               <FormField label="Series">
@@ -88,6 +241,23 @@ export default function ProductEditor() {
             <div style={{ marginTop: 16 }}>
               <FormField label="Product Name" required>
                 <input style={inputStyle} value={form.productName} onChange={set("productName")} placeholder="e.g. DVC6200 Digital Valve Controller" />
+              </FormField>
+            </div>
+          </AdminCard>
+
+          <AdminCard title="Specifications">
+            <div className="tm-pe-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <FormField label="Price" hint="Numeric value only, e.g. 249.00">
+                <input style={inputStyle} type="number" step="0.01" value={form.price} onChange={set("price")} placeholder="e.g. 249.00" />
+              </FormField>
+              <FormField label="Size">
+                <input style={inputStyle} value={form.size} onChange={set("size")} placeholder="e.g. DN50 / 2 in" />
+              </FormField>
+              <FormField label="Rating" hint="e.g. pressure or temperature class.">
+                <input style={inputStyle} value={form.rating} onChange={set("rating")} placeholder="e.g. Class 150" />
+              </FormField>
+              <FormField label="Type">
+                <input style={inputStyle} value={form.type} onChange={set("type")} placeholder="e.g. Flanged" />
               </FormField>
             </div>
           </AdminCard>
@@ -114,23 +284,45 @@ export default function ProductEditor() {
               <FormField label="Alternative Part Numbers" hint="OEM or cross-reference part numbers.">
                 <TagInput value={form.alternativePartNumbers} onChange={(v) => setForm((f) => ({ ...f, alternativePartNumbers: v }))} placeholder="e.g. DVC6200SIS" />
               </FormField>
-              <FormField label="Related Products" hint='Format: manufacturer-slug/product-slug, e.g. "emerson/3051s".'>
+              <FormField label="Related Products" hint='Format: manufacturer-slug/product-slug, e.g. "emerson/3051s". Must already exist.'>
                 <TagInput value={form.relatedProducts} onChange={(v) => setForm((f) => ({ ...f, relatedProducts: v }))} placeholder="e.g. emerson/3051s" />
               </FormField>
             </div>
           </AdminCard>
 
-          <AdminCard title="Datasheet">
-            <FormField label="Datasheet Upload (PDF)" hint="File storage isn't connected yet in Phase 1 — this captures the filename only.">
-              <label style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: `1.5px dashed ${ADMIN_COLORS.border}`,
-                borderRadius: 6, cursor: "pointer", fontSize: 13, color: ADMIN_COLORS.medGray,
-              }}>
-                <Icon type="upload" size={16} color={ADMIN_COLORS.medGray} />
-                {datasheetName || "Choose PDF file…"}
-                <input type="file" accept="application/pdf" style={{ display: "none" }} onChange={(e) => setDatasheetName(e.target.files?.[0]?.name || "")} />
-              </label>
-            </FormField>
+          <AdminCard title="Media">
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <FormField label="Product Image">
+                <label style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: `1.5px dashed ${ADMIN_COLORS.border}`,
+                  borderRadius: 6, cursor: uploadingImage ? "default" : "pointer", fontSize: 13, color: ADMIN_COLORS.medGray,
+                }}>
+                  <Icon type="upload" size={16} color={ADMIN_COLORS.medGray} />
+                  {uploadingImage ? "Uploading…" : form.imageUrl ? "Image uploaded — choose to replace" : "Choose image file…"}
+                  <input type="file" accept="image/*" style={{ display: "none" }} disabled={uploadingImage}
+                    onChange={(e) => handleImageUpload(e.target.files?.[0])} />
+                </label>
+                {form.imageUrl && (
+                  <img src={form.imageUrl} alt="Product preview" style={{ marginTop: 10, maxHeight: 100, borderRadius: 6, border: `1px solid ${ADMIN_COLORS.border}` }} />
+                )}
+              </FormField>
+              <FormField label="Datasheet (PDF)">
+                <label style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: `1.5px dashed ${ADMIN_COLORS.border}`,
+                  borderRadius: 6, cursor: uploadingDatasheet ? "default" : "pointer", fontSize: 13, color: ADMIN_COLORS.medGray,
+                }}>
+                  <Icon type="upload" size={16} color={ADMIN_COLORS.medGray} />
+                  {uploadingDatasheet ? "Uploading…" : form.datasheetUrl ? "Datasheet uploaded — choose to replace" : "Choose PDF file…"}
+                  <input type="file" accept="application/pdf" style={{ display: "none" }} disabled={uploadingDatasheet}
+                    onChange={(e) => handleDatasheetUpload(e.target.files?.[0])} />
+                </label>
+                {form.datasheetUrl && (
+                  <a href={form.datasheetUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: ADMIN_COLORS.accent }}>
+                    View uploaded datasheet
+                  </a>
+                )}
+              </FormField>
+            </div>
           </AdminCard>
 
           <AdminCard title="SEO">
@@ -155,11 +347,11 @@ export default function ProductEditor() {
               </select>
             </FormField>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 18 }}>
-              <Button variant="primary" onClick={() => handleSave("published")} style={{ width: "100%", justifyContent: "center" }}>
-                Publish
+              <Button variant="primary" disabled={saving} onClick={() => handleSave("published")} style={{ width: "100%", justifyContent: "center", opacity: saving ? 0.7 : 1 }}>
+                {saving ? "Saving…" : "Publish"}
               </Button>
-              <Button variant="outline" onClick={() => handleSave("draft")} style={{ width: "100%", justifyContent: "center" }}>
-                Save Draft
+              <Button variant="outline" disabled={saving} onClick={() => handleSave("draft")} style={{ width: "100%", justifyContent: "center", opacity: saving ? 0.7 : 1 }}>
+                {saving ? "Saving…" : "Save Draft"}
               </Button>
             </div>
           </AdminCard>

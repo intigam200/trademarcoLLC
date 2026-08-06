@@ -8,65 +8,10 @@ export const NAV_LINKS = [
   { label: "Contact", href: "/#contact" },
 ];
 
-export const PRODUCTS = [
-  {
-    slug: "valves", title: "Valves",
-    desc: "Gate, globe, ball, check, butterfly and more.",
-    image: "/images/products/valve.png",
-    fullDescription: "Industrial valves for controlling, isolating and regulating flow across demanding process applications.",
-    types: ["Gate Valves", "Globe Valves", "Ball Valves", "Butterfly Valves", "Check Valves", "Control Valves", "Plug Valves", "Safety / Relief Valves"],
-  },
-  {
-    slug: "filters", title: "Filters",
-    desc: "Y-strainers, basket filters, cartridge filters and more.",
-    image: "/images/products/filters.png",
-    fullDescription: "Filtration equipment and components for process, fluid and industrial applications.",
-    types: ["Y-Strainers", "Basket Strainers", "Cartridge Filters", "Bag Filters", "Duplex Filters", "Coalescing Filters", "Air / Gas Filters", "Filter Elements"],
-  },
-  {
-    slug: "pipes-fittings", title: "Pipes & Fittings",
-    desc: "Stainless steel, carbon steel, alloy fittings and flanges.",
-    image: "/images/products/pipes.png",
-    fullDescription: "Piping products and fittings for industrial, process and infrastructure applications.",
-    types: ["Pipes", "Elbows", "Tees", "Reducers", "Flanges", "Couplings", "Butt Weld Fittings", "Forged Fittings"],
-  },
-  {
-    slug: "instrumentation", title: "Instrumentation",
-    desc: "Pressure, temperature, flow and level instruments.",
-    image: "/images/products/instrumentation.png",
-    fullDescription: "Industrial measurement and instrumentation equipment for monitoring pressure, temperature, flow and level.",
-    types: ["Pressure Gauges", "Pressure Transmitters", "Temperature Instruments", "Flow Meters", "Level Instruments", "Differential Pressure Instruments", "Instrument Accessories", "Process Sensors"],
-  },
-  {
-    slug: "electrical", title: "Electrical",
-    desc: "Motors, drives, control and automation parts.",
-    image: "/images/products/electrical.png",
-    fullDescription: "Electrical and automation equipment supporting industrial power, control and process applications.",
-    types: ["Electric Motors", "Drives", "Control Panels", "Switchgear", "Motor Starters", "Automation Components", "Electrical Components", "Industrial Controls"],
-  },
-  {
-    slug: "spare-parts", title: "Spare Parts",
-    desc: "Industrial spare parts for various applications.",
-    image: "/images/products/spareparts.png",
-    fullDescription: "Industrial spare parts and replacement components for maintenance, repair and operational requirements.",
-    types: ["Replacement Parts", "Mechanical Components", "Seals & Gaskets", "Bearings", "Fasteners", "Pump Components", "Valve Components", "OEM / Equivalent Parts"],
-  },
-];
-
-export const MANUFACTURERS = [
-  { slug: "abb", name: "ABB", desc: "Global technology leader in electrification and industrial automation.", logo: "/images/products/logosm/abb-logo-black-and-white.png" },
-  { slug: "emerson", name: "Emerson", desc: "Global provider of automation, measurement and control technologies for process industries.", logo: "/images/products/logosm/emerson-electric-logo-black-and-white.png" },
-  { slug: "fisher", name: "Fisher", desc: "Control valve and regulator brand widely used in process control applications." },
-  { slug: "parker", name: "Parker", desc: "Global manufacturer of motion and control technologies, including hydraulics, pneumatics and fluid connectors.", logo: "/images/products/logosm/parker.png" },
-  { slug: "honeywell", name: "Honeywell", desc: "Diversified technology manufacturer with a strong presence in industrial automation and process instrumentation.", logo: "/images/products/logosm/honeywell.png" },
-  { slug: "yokogawa", name: "Yokogawa", desc: "Manufacturer specializing in industrial automation, measurement and control instrumentation.", logo: "/images/products/logosm/yokogawa.png" },
-  { slug: "siemens", name: "Siemens", desc: "Global industrial manufacturer providing automation, electrification and digitalization technologies.", logo: "/images/products/logosm/siemens.png" },
-  { slug: "swagelok", name: "Swagelok", desc: "Manufacturer of fluid system products including fittings, valves and tubing for critical applications.", logo: "/images/products/logosm/images.jpg" },
-  { slug: "spirax-sarco", name: "Spirax Sarco", desc: "Specialist manufacturer of steam and thermal energy management solutions.", logo: "/images/products/logosm/spirax.png", logoDark: true },
-  { slug: "flowserve", name: "Flowserve", desc: "Manufacturer of flow control products, including pumps, valves and seals for industrial applications.", logo: "/images/products/logosm/Flowserve.png" },
-  { slug: "velan", name: "Velan", desc: "Manufacturer of industrial valves for severe-service and critical applications.", logo: "/images/products/logosm/velan.jpg" },
-  { slug: "samson", name: "Samson", desc: "Manufacturer of control valves and instrumentation for process automation.", logo: "/images/products/logosm/samson.png" },
-];
+// Manufacturers and product categories now live in Supabase (see
+// supabase/schema.sql + supabase/seed.sql, and src/lib/supabase/manufacturers.js
+// / categories.js) instead of being hardcoded here — every page that used to
+// import PRODUCTS/MANUFACTURERS from this file now fetches them live.
 
 export const OEM_FEATURES = [
   { icon: "shield-check", title: "Genuine Products", desc: "We source through manufacturers and authorized supply channels to help ensure product authenticity." },
@@ -128,7 +73,7 @@ export const ABOUT_FEATURES = [
   { icon: "calendar", title: "Founded 2026", desc: "Registered as a Wyoming LLC" },
   { icon: "bar-chart", title: `${INDUSTRIES.length} Industries Served`, desc: "Sourcing across key industrial sectors" },
   { icon: "map-pin", title: "Wyoming, USA", desc: "U.S.-registered and based" },
-  { icon: "box", title: `${PRODUCTS.length} Product Categories`, desc: "From valves to spare parts" },
+  { icon: "box", title: "6 Product Categories", desc: "From valves to spare parts" },
 ];
 
 export const COMPANY_INFO = [

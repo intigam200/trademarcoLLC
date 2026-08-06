@@ -1,16 +1,58 @@
+import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
-import { PRODUCTS } from "../data/content";
+import { listCategories } from "../lib/supabase/categories";
+import { listProducts } from "../lib/supabase/products";
+import { setSEO } from "../lib/seo";
 import { Section, SectionTitle } from "../components/Section";
+import LoadingState from "../components/LoadingState";
+import EmptyState from "../components/EmptyState";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeSlug = searchParams.get("category");
-  const active = PRODUCTS.find((p) => p.slug === activeSlug) || PRODUCTS[0];
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    listCategories({ status: "active" }).then(setCategories).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+
+  const active = categories.find((c) => c.slug === activeSlug) || categories[0];
 
   const selectCategory = (slug) => setSearchParams({ category: slug });
+
+  const [categoryProducts, setCategoryProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!active) return;
+    let cancelled = false;
+    setProductsLoading(true);
+    listProducts({ categoryId: active.id, status: "published" })
+      .then((data) => { if (!cancelled) setCategoryProducts(data); })
+      .catch(() => { if (!cancelled) setCategoryProducts([]); })
+      .finally(() => { if (!cancelled) setProductsLoading(false); });
+    return () => { cancelled = true; };
+  }, [active]);
+
+  useEffect(() => {
+    if (active) {
+      setSEO({
+        title: active.seo_title || `${active.name} | Industrial Products | TradeMarco Global`,
+        description: active.seo_description || active.full_description || `Browse ${active.name} industrial products and equipment supplied by Trademarco Global. Request a quotation today.`,
+        path: `/products?category=${active.slug}`,
+      });
+    } else if (!loading) {
+      setSEO({
+        title: "Industrial Equipment & Components | TradeMarco Global",
+        description: "Browse industrial equipment and components sourced from qualified manufacturers worldwide by Trademarco Global. Request a quotation today.",
+        path: "/products",
+      });
+    }
+  }, [active, loading]);
 
   return (
     <>
@@ -41,13 +83,22 @@ export default function Products() {
           <Link to="/" style={{ color: COLORS.medGray, textDecoration: "none" }}>Home</Link>
           <span style={{ color: COLORS.borderGray }}>/</span>
           <Link to="/products" style={{ color: COLORS.medGray, textDecoration: "none" }}>Products</Link>
-          <span style={{ color: COLORS.borderGray }}>/</span>
-          <span style={{ color: COLORS.navy, fontWeight: 600 }}>{active.title}</span>
+          {active && (
+            <>
+              <span style={{ color: COLORS.borderGray }}>/</span>
+              <span style={{ color: COLORS.navy, fontWeight: 600 }}>{active.name}</span>
+            </>
+          )}
         </div>
       </div>
 
       {/* ── CATEGORY EXPLORER ── */}
       <Section bg={COLORS.white}>
+        {loading ? (
+          <LoadingState label="Loading categories…" />
+        ) : !active ? (
+          <EmptyState icon="box" title="No categories yet" description="Product categories will appear here once they're published." />
+        ) : (
         <div className="tm-products-grid" style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 40, alignItems: "start" }}>
           {/* LEFT — category nav */}
           <div>
@@ -55,12 +106,12 @@ export default function Products() {
               Products
             </div>
             <div className="tm-cat-nav" style={{ display: "flex", flexDirection: "column" }}>
-              {PRODUCTS.map((p) => {
-                const isActive = p.slug === active.slug;
+              {categories.map((c) => {
+                const isActive = c.slug === active.slug;
                 return (
                   <button
-                    key={p.slug}
-                    onClick={() => selectCategory(p.slug)}
+                    key={c.slug}
+                    onClick={() => selectCategory(c.slug)}
                     className={`tm-cat-nav-item${isActive ? " tm-cat-nav-item-active" : ""}`}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -69,7 +120,7 @@ export default function Products() {
                       background: "transparent", color: COLORS.medGray, transition: "background 0.15s ease, color 0.15s ease",
                     }}
                   >
-                    {p.title}
+                    {c.name}
                     <Icon type="arrow-right" size={14} color={isActive ? COLORS.orange : COLORS.borderGray} className="tm-cat-nav-arrow" />
                   </button>
                 );
@@ -81,19 +132,19 @@ export default function Products() {
           <div key={active.slug} className="tm-cat-detail" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "start" }}>
             <div style={{ background: COLORS.lightGray, borderRadius: 10, border: `1px solid ${COLORS.borderGray}`, overflow: "hidden" }}>
               <div style={{ aspectRatio: "1 / 1", display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}>
-                <img src={active.image} alt={active.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                <img src={active.image_url} alt={active.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               </div>
             </div>
 
             <div>
               <h2 style={{ fontSize: "clamp(24px, 2.6vw, 30px)", fontWeight: 800, color: COLORS.navy, margin: "0 0 14px", letterSpacing: "-0.01em" }}>
-                {active.title}
+                {active.name}
               </h2>
               <p style={{ fontSize: 15, lineHeight: 1.75, color: COLORS.medGray, margin: "0 0 28px", maxWidth: 420 }}>
-                {active.fullDescription}
+                {active.full_description}
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px 24px" }}>
-                {active.types.map((t) => (
+                {(active.types ?? []).map((t) => (
                   <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: COLORS.navy }}>
                     <span style={{ width: 5, height: 5, borderRadius: "50%", background: COLORS.orange, flexShrink: 0 }} />
                     {t}
@@ -103,8 +154,43 @@ export default function Products() {
             </div>
           </div>
         </div>
+        )}
+
+        {active && !productsLoading && categoryProducts.length > 0 && (
+          <div style={{ marginTop: 56, paddingTop: 40, borderTop: `1px solid ${COLORS.borderGray}` }}>
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: COLORS.navy, margin: "0 0 24px" }}>
+              {active.name} Products
+            </h3>
+            <div className="tm-cat-products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 24 }}>
+              {categoryProducts.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/manufacturers/${p.manufacturer?.slug}/${p.slug}`}
+                  className="tm-cat-product-card"
+                  style={{ display: "flex", flexDirection: "column", background: COLORS.white, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, overflow: "hidden", textDecoration: "none" }}
+                >
+                  {p.image_url && (
+                    <div style={{ height: 150, background: COLORS.lightGray, borderBottom: `1px solid ${COLORS.borderGray}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <img src={p.image_url} alt={p.product_name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                    </div>
+                  )}
+                  <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: 20 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: COLORS.medGray, marginBottom: 6 }}>{p.manufacturer?.name} — {p.part_number}</div>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, margin: "0 0 8px" }}>{p.product_name}</h4>
+                    <p style={{ fontSize: 13, lineHeight: 1.5, color: COLORS.medGray, margin: "0 0 14px", flexGrow: 1 }}>{p.short_description}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: COLORS.orange }}>
+                      View Product <Icon type="arrow-right" size={14} color={COLORS.orange} />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <style>{`
+          .tm-cat-product-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+          .tm-cat-product-card:hover { box-shadow: 0 10px 25px rgba(27,42,74,0.12); transform: translateY(-4px); }
           .tm-cat-nav-item:hover { background: ${COLORS.lightGray}; color: ${COLORS.navy}; }
           .tm-cat-nav-item-active { background: rgba(45,114,210,0.06); color: ${COLORS.navy} !important; border-left-color: ${COLORS.orange} !important; }
           .tm-cat-detail { animation: tm-cat-fade-in 0.25s ease; }

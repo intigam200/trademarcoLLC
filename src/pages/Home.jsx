@@ -1,12 +1,29 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
-import { PRODUCTS, INDUSTRIES, INDUSTRIES_INFO, WHY_ITEMS, REGIONS, HOW_WE_WORK, ABOUT_FEATURES, CONTACT_INFO, BENEFIT_ITEMS, HERO_TRUST } from "../data/content";
+import { INDUSTRIES, INDUSTRIES_INFO, WHY_ITEMS, REGIONS, HOW_WE_WORK, ABOUT_FEATURES, CONTACT_INFO, BENEFIT_ITEMS, HERO_TRUST } from "../data/content";
+import { listCategories } from "../lib/supabase/categories";
+import { setSEO } from "../lib/seo";
 import { Section, SectionLabel, SectionTitle, SectionDesc } from "../components/Section";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 import ContactForm from "../components/ContactForm";
 
 export default function Home() {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    listCategories({ status: "active" }).then(setCategories).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setSEO({
+      title: "Trademarco Global | Industrial Automation & Process Equipment Supplier",
+      description: "Trademarco Global supplies industrial automation, control valves, instrumentation, electrical equipment and spare parts worldwide. Request a quotation today.",
+      path: "/",
+    });
+  }, []);
+
   return (
     <>
       {/* ── HERO ── */}
@@ -139,18 +156,18 @@ export default function Home() {
         <div className="tm-products-grid" style={{
           display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 20, marginTop: 48,
         }}>
-          {PRODUCTS.map((p) => (
-            <Link key={p.slug} to={`/products?category=${p.slug}`} className="tm-hover-icon tm-product-card" style={{
+          {categories.map((c) => (
+            <Link key={c.slug} to={`/products?category=${c.slug}`} className="tm-hover-icon tm-product-card" style={{
               display: "flex", flexDirection: "column", height: "100%",
               background: COLORS.white, border: `1px solid ${COLORS.borderGray}`, borderRadius: 8,
               overflow: "hidden", textDecoration: "none",
             }}>
               <div style={{ height: 160, padding: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <img src={p.image} alt={p.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                <img src={c.image_url} alt={c.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               </div>
               <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>{p.title}</h3>
-                <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: "0 0 14px", flexGrow: 1 }}>{p.desc}</p>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>{c.name}</h3>
+                <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: "0 0 14px", flexGrow: 1 }}>{c.description}</p>
                 <Icon type="arrow-right" size={18} color={COLORS.orange} />
               </div>
             </Link>
@@ -311,7 +328,7 @@ export default function Home() {
           <SectionTitle color={COLORS.white} style={{ marginLeft: "auto", marginRight: "auto" }}>
             Sourcing from Every Major<br />Industrial Region
           </SectionTitle>
-          <SectionDesc color="rgba(255,255,255,0.55)" style={{ margin: "0 auto" }}>
+          <SectionDesc color="rgba(255, 255, 255, 0.87)" style={{ margin: "0 auto" }}>
             Our network spans manufacturers across North America, Europe, the Middle East and Asia-Pacific — giving you access to the best products at the right price point.
           </SectionDesc>
         </div>

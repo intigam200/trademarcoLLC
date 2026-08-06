@@ -6,6 +6,13 @@ import Icon from "../../components/Icon";
 // by a `columns` definition and a `rows` array. Reused across every admin
 // list page (Products, Manufacturers, Categories, RFQs) so list behavior
 // stays consistent without duplicating table logic per page.
+//
+// By default everything (search/filter/sort/paging) runs client-side over
+// the full `rows` array — fine for lists that stay small (manufacturers,
+// categories, RFQs). Pass `serverMode` for lists that can grow large (e.g.
+// products): the table then renders `rows` as-is (already the current page
+// from the server) and defers search/filter/page changes to the caller via
+// onSearchChange/onFilterChange/onPageChange instead of filtering locally.
 export default function DataTable({
   columns,
   rows,
@@ -15,6 +22,15 @@ export default function DataTable({
   actions,
   emptyMessage = "No records found.",
   pageSize = 10,
+  serverMode = false,
+  totalCount = 0,
+  loading = false,
+  page: serverPage = 1,
+  onPageChange,
+  search: serverSearch = "",
+  onSearchChange,
+  activeFilters: serverFilters = {},
+  onFilterChange,
 }) {
   const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState({});
@@ -22,6 +38,7 @@ export default function DataTable({
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
+    if (serverMode) return rows;
     let result = rows;
     if (search.trim() && searchKeys.length) {
       const q = search.trim().toLowerCase();
@@ -41,14 +58,35 @@ export default function DataTable({
       });
     }
     return result;
-  }, [rows, search, activeFilters, sort, searchKeys]);
+  }, [rows, search, activeFilters, sort, searchKeys, serverMode]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const totalPages = serverMode
+    ? Math.max(1, Math.ceil(totalCount / pageSize))
+    : Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = serverMode ? serverPage : Math.min(page, totalPages);
+  const pageRows = serverMode ? rows : filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const resultCount = serverMode ? totalCount : filtered.length;
 
   const toggleSort = (key) => {
+    if (serverMode) return; // rows already arrive sorted by the server query
     setSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
+  };
+
+  const handleSearchChange = (value) => {
+    if (serverMode) { onSearchChange?.(value); return; }
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleFilterChange = (key, value) => {
+    if (serverMode) { onFilterChange?.(key, value); return; }
+    setActiveFilters((v) => ({ ...v, [key]: value }));
+    setPage(1);
+  };
+
+  const handlePageChange = (next) => {
+    if (serverMode) { onPageChange?.(next); return; }
+    setPage(next);
   };
 
   const selectStyle = {
@@ -70,8 +108,8 @@ export default function DataTable({
             <Icon type="search" size={15} color={ADMIN_COLORS.medGray} />
           </span>
           <input
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            value={serverMode ? serverSearch : search}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder={searchPlaceholder}
             style={{
               width: "100%", padding: "10px 12px 10px 36px", fontSize: 13, fontFamily: "inherit",
@@ -83,8 +121,8 @@ export default function DataTable({
         {filters.map((f) => (
           <select
             key={f.key}
-            value={activeFilters[f.key] || ""}
-            onChange={(e) => { setActiveFilters((v) => ({ ...v, [f.key]: e.target.value })); setPage(1); }}
+            value={(serverMode ? serverFilters[f.key] : activeFilters[f.key]) || ""}
+            onChange={(e) => handleFilterChange(f.key, e.target.value)}
             style={selectStyle}
           >
             <option value="">{f.label}</option>
@@ -104,12 +142,12 @@ export default function DataTable({
                   style={{
                     textAlign: "left", padding: "12px 16px", borderBottom: `1px solid ${ADMIN_COLORS.border}`,
                     color: ADMIN_COLORS.medGray, fontWeight: 600, fontSize: 11, textTransform: "uppercase",
-                    letterSpacing: "0.04em", cursor: col.sortable !== false ? "pointer" : "default", whiteSpace: "nowrap",
+                    letterSpacing: "0.04em", cursor: !serverMode && col.sortable !== false ? "pointer" : "default", whiteSpace: "nowrap",
                   }}
                 >
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                     {col.label}
-                    {col.sortable !== false && sort.key === col.key && (
+                    {!serverMode && col.sortable !== false && sort.key === col.key && (
                       <Icon type={sort.dir === "asc" ? "chevron-up" : "chevron-down"} size={12} color={ADMIN_COLORS.medGray} />
                     )}
                   </span>
@@ -119,7 +157,13 @@ export default function DataTable({
             </tr>
           </thead>
           <tbody>
-            {pageRows.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={columns.length + (actions ? 1 : 0)} style={{ padding: "48px 16px", textAlign: "center", color: ADMIN_COLORS.medGray }}>
+                  Loading&hellip;
+                </td>
+              </tr>
+            ) : pageRows.length === 0 ? (
               <tr>
                 <td colSpan={columns.length + (actions ? 1 : 0)} style={{ padding: "48px 16px", textAlign: "center", color: ADMIN_COLORS.medGray }}>
                   {emptyMessage}
@@ -141,16 +185,16 @@ export default function DataTable({
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, fontSize: 13, color: ADMIN_COLORS.medGray, flexWrap: "wrap", gap: 12 }}>
         <span>
-          {filtered.length === 0
+          {resultCount === 0
             ? "0 results"
-            : `Showing ${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, filtered.length)} of ${filtered.length}`}
+            : `Showing ${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, resultCount)} of ${resultCount}`}
         </span>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <button disabled={currentPage <= 1} onClick={() => setPage((p) => p - 1)} style={pagerBtnStyle(currentPage <= 1)}>
+          <button disabled={currentPage <= 1} onClick={() => handlePageChange(currentPage - 1)} style={pagerBtnStyle(currentPage <= 1)}>
             <Icon type="chevron-left" size={14} color={ADMIN_COLORS.navy} />
           </button>
           <span style={{ minWidth: 60, textAlign: "center" }}>{currentPage} / {totalPages}</span>
-          <button disabled={currentPage >= totalPages} onClick={() => setPage((p) => p + 1)} style={pagerBtnStyle(currentPage >= totalPages)}>
+          <button disabled={currentPage >= totalPages} onClick={() => handlePageChange(currentPage + 1)} style={pagerBtnStyle(currentPage >= totalPages)}>
             <Icon type="chevron-right" size={14} color={ADMIN_COLORS.navy} />
           </button>
         </div>
