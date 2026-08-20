@@ -11,9 +11,17 @@ import ContactForm from "../components/ContactForm";
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
+  const [heroHovered, setHeroHovered] = useState(false);
+  const [heroScrolled, setHeroScrolled] = useState(false);
 
   useEffect(() => {
     listCategories({ status: "active" }).then(setCategories).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => { if (window.scrollY > 80) setHeroScrolled(true); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -27,11 +35,17 @@ export default function Home() {
   return (
     <>
       {/* ── HERO ── */}
-      <section id="hero" className="tm-hero-section" style={{
-        background: COLORS.navy,
-        display: "flex", alignItems: "center",
-        position: "relative", overflow: "hidden",
-      }}>
+      <section
+        id="hero"
+        className="tm-hero-section"
+        onMouseEnter={() => setHeroHovered(true)}
+        onMouseLeave={() => setHeroHovered(false)}
+        style={{
+          background: COLORS.navy,
+          display: "flex", alignItems: "center",
+          position: "relative", overflow: "hidden",
+        }}
+      >
         {/* Photo — occupies the right ~60% of the hero. Its own left edge is feathered
             via mask-image so it dissolves into the navy background instead of reading
             as a cropped rectangle; the image itself stays sharp and true to color. */}
@@ -90,10 +104,37 @@ export default function Home() {
           </div>
         </div>
 
+        <div
+          aria-hidden="true"
+          className={`tm-hero-scroll-indicator${heroHovered && !heroScrolled ? " tm-hero-scroll-indicator-visible" : ""}`}
+        />
+
         <style>{`
           .tm-hero-section {
             min-height: 80vh;
             min-height: 80svh;
+          }
+          .tm-hero-scroll-indicator {
+            position: absolute; bottom: 28px; left: 50%;
+            width: 44px; height: 2px; border-radius: 2px;
+            background: rgba(255,255,255,0.7);
+            box-shadow: 0 0 10px 1px rgba(255,255,255,0.5);
+            opacity: 0;
+            transform: translate(-50%, 0);
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+            z-index: 2;
+          }
+          .tm-hero-scroll-indicator-visible {
+            opacity: 1;
+            animation: tm-hero-scroll-float 2.4s ease-in-out infinite;
+          }
+          @keyframes tm-hero-scroll-float {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, -6px); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .tm-hero-scroll-indicator, .tm-hero-scroll-indicator-visible { animation: none; transition: none; }
           }
           @media (max-width: 768px) {
             .tm-hero-photo {
@@ -163,7 +204,7 @@ export default function Home() {
               overflow: "hidden", textDecoration: "none",
             }}>
               <div style={{ height: 160, padding: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <img src={c.image_url} alt={c.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                <img src={c.image_url} alt={c.name} loading="lazy" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               </div>
               <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>{c.name}</h3>
@@ -363,9 +404,14 @@ export default function Home() {
           <ellipse cx="430" cy="190" rx="30" ry="18" fill="url(#tm-about-dots)" />
         </svg>
 
-        {/* port photo — small, bottom-left corner, dissolving into the background */}
-        <div style={{
-          position: "absolute", left: 0, bottom: 0, width: 700, height: 250,
+        {/* port photo — small, bottom-left corner, dissolving into the background.
+            Sized with clamp() (not a fixed px box) so it scales down smoothly as the
+            viewport narrows instead of overhanging its section, and is hidden once the
+            layout stacks to a single column (see .tm-about-ship-img below) so it can
+            never drift over the stacked text on tablet/mobile. */}
+        <div className="tm-about-ship-img" style={{
+          position: "absolute", left: 0, bottom: 0,
+          width: "clamp(320px, 42vw, 700px)", height: "clamp(160px, 20vw, 250px)",
           backgroundImage: "url('/images/products/port.png')",
           backgroundSize: "cover", backgroundPosition: "center",
           maskImage: "radial-gradient(circle at 0% 100%, black 15%, transparent 70%)",
@@ -429,6 +475,7 @@ export default function Home() {
         <style>{`
           @media (max-width: 900px) {
             .tm-about-grid { grid-template-columns: 1fr !important; }
+            .tm-about-ship-img { display: none; }
           }
           @media (max-width: 640px) {
             .tm-about-features { grid-template-columns: repeat(2, 1fr) !important; }

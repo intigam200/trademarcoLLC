@@ -13,15 +13,6 @@ const FIELD_LABELS = {
   message: "Your Inquiry",
 };
 
-const RFQ_STEPS = [
-  "Complete the form",
-  "Submit your request",
-  "Receive a confirmation email",
-  "Our sales team reviews your request",
-  "A quotation is prepared",
-  "A sales representative contacts you",
-];
-
 function validateField(key, value) {
   const v = value.trim();
   switch (key) {
@@ -65,34 +56,6 @@ function TextField({ id, label, required, optionalHint, error, textarea, inputRe
       />
       {error && <div id={errorId} role="alert" style={{ fontSize: 12, color: "#C0392B", marginTop: 5 }}>{error}</div>}
     </div>
-  );
-}
-
-// Collapsible, always-open-by-default explainer so a first-time visitor
-// always knows what happens after they click Submit — native <details> gives
-// this free keyboard/screen-reader support without extra JS state.
-function RFQSteps() {
-  return (
-    <details className="tm-cf-steps" open style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 6, padding: "10px 14px" }}>
-      <summary className="tm-cf-steps-summary" style={{ cursor: "pointer", fontSize: 12, fontWeight: 700, color: COLORS.navy, display: "flex", alignItems: "center", gap: 8, userSelect: "none" }}>
-        <Icon type="info" size={14} color={COLORS.orange} />
-        How the RFQ Process Works
-        <Icon type="chevron-down" size={12} color={COLORS.medGray} className="tm-cf-steps-chevron" />
-      </summary>
-      <ol style={{ margin: "12px 0 0", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 7 }}>
-        {RFQ_STEPS.map((label, i) => (
-          <li key={label} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: COLORS.medGray }}>
-            <span style={{
-              flexShrink: 0, width: 18, height: 18, borderRadius: "50%", background: COLORS.orange, color: COLORS.white,
-              fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              {i + 1}
-            </span>
-            {label}
-          </li>
-        ))}
-      </ol>
-    </details>
   );
 }
 
@@ -266,8 +229,6 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
 
-      <RFQSteps />
-
       {isProductContext && (
         <div style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 6, padding: "10px 14px" }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 3 }}>
@@ -302,12 +263,12 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
       <div className="tm-cf-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         <TextField id="rfq-phone" label="Phone Number" optionalHint="(optional)" type="tel" value={form.phone} onChange={set("phone")}
           placeholder="+1 (XXX) XXX-XXXX" inputRef={(el) => (fieldRefs.current.phone = el)} autoComplete="tel" />
-        <TextField id="rfq-country" label="Country / Delivery Destination" value={form.country} onChange={set("country")}
-          placeholder="e.g. Saudi Arabia, Houston TX" inputRef={(el) => (fieldRefs.current.country = el)} autoComplete="country-name" />
+        <TextField id="rfq-country" label="Country" optionalHint="(optional)" value={form.country} onChange={set("country")}
+          placeholder="e.g. Saudi Arabia" inputRef={(el) => (fieldRefs.current.country = el)} autoComplete="country-name" />
       </div>
 
       <TextField id="rfq-message" label={FIELD_LABELS.message} required textarea value={form.message} onChange={set("message")} onBlur={blurValidate("message")}
-        error={errors.message} placeholder="Describe the products you need: type, specifications, quantity, delivery destination..."
+        error={errors.message} placeholder="Describe the products you need: type, specifications, quantity..."
         inputRef={(el) => (fieldRefs.current.message = el)} />
 
       <Turnstile onToken={setTurnstileToken} resetKey={resetKey} />
@@ -334,10 +295,6 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
       </Button>
 
       <style>{`
-        .tm-cf-steps-summary::-webkit-details-marker { display: none; }
-        .tm-cf-steps-summary { list-style: none; }
-        .tm-cf-steps-chevron { transition: transform 0.15s ease; margin-left: auto; }
-        .tm-cf-steps[open] .tm-cf-steps-chevron { transform: rotate(180deg); }
         .tm-cf-field:focus { border-color: ${COLORS.navy}; }
         .tm-cf-field[aria-invalid="true"]:focus { border-color: #C0392B; }
         .tm-cf-spinner {

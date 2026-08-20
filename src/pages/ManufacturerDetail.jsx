@@ -3,19 +3,23 @@ import { useParams, Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
 import { getManufacturerBySlug } from "../lib/supabase/manufacturers";
 import { listProducts } from "../lib/supabase/products";
-import { setSEO, setNoIndexSEO } from "../lib/seo";
+import { setSEO, setNoIndexSEO, setJSONLD, SITE_URL } from "../lib/seo";
 import { Section } from "../components/Section";
 import LoadingState from "../components/LoadingState";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 
+const PAGE_SIZE = 12;
+
 export default function ManufacturerDetail() {
   const { slug } = useParams();
   const [state, setState] = useState({ status: "loading", manufacturer: null, products: [] });
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     let cancelled = false;
     setState({ status: "loading", manufacturer: null, products: [] });
+    setVisibleCount(PAGE_SIZE);
     getManufacturerBySlug(slug)
       .then(async (manufacturer) => {
         if (cancelled) return;
@@ -41,9 +45,20 @@ export default function ManufacturerDetail() {
         image: manufacturer.logo_url || undefined,
         path: `/manufacturers/${manufacturer.slug}`,
       });
+      setJSONLD({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+          { "@type": "ListItem", position: 2, name: "Manufacturers", item: `${SITE_URL}/manufacturers` },
+          { "@type": "ListItem", position: 3, name: manufacturer.name, item: `${SITE_URL}/manufacturers/${manufacturer.slug}` },
+        ],
+      });
     } else if (status === "not-found") {
       setNoIndexSEO("Manufacturer Not Found | Trademarco Global");
+      setJSONLD(null);
     }
+    return () => setJSONLD(null);
   }, [manufacturer, status]);
 
   if (status === "loading") {
@@ -108,14 +123,14 @@ export default function ManufacturerDetail() {
         /* ── PRODUCTS GRID ── */
         <Section bg={COLORS.lightGray}>
           <div className="tm-mfr-products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 24 }}>
-            {products.map((p) => (
+            {products.slice(0, visibleCount).map((p) => (
               <Link key={p.id} to={`/manufacturers/${manufacturer.slug}/${p.slug}`} className="tm-mfr-product-card" style={{
                 display: "flex", flexDirection: "column", background: COLORS.white,
                 border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, overflow: "hidden", textDecoration: "none",
               }}>
                 {p.image_url && (
                   <div style={{ height: 160, background: COLORS.lightGray, borderBottom: `1px solid ${COLORS.borderGray}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <img src={p.image_url} alt={p.product_name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                    <img src={p.image_url} alt={p.product_name} loading="lazy" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
                   </div>
                 )}
                 <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: 24 }}>
@@ -129,9 +144,28 @@ export default function ManufacturerDetail() {
               </Link>
             ))}
           </div>
+
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginTop: 40 }}>
+            <div style={{ fontSize: 13, color: COLORS.medGray }}>
+              Showing {Math.min(visibleCount, products.length)} of {products.length} products
+            </div>
+            {visibleCount < products.length && (
+              <Button variant="outline" onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}>
+                Load More
+              </Button>
+            )}
+          </div>
+
           <style>{`
-            .tm-mfr-product-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+            .tm-mfr-product-card { transition: box-shadow 0.2s ease, transform 0.2s ease; animation: tm-mfr-fade-in 0.35s ease; }
             .tm-mfr-product-card:hover { box-shadow: 0 10px 25px rgba(27,42,74,0.12); transform: translateY(-4px); }
+            @keyframes tm-mfr-fade-in {
+              from { opacity: 0; transform: translateY(4px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .tm-mfr-product-card { animation: none; }
+            }
           `}</style>
         </Section>
       ) : (

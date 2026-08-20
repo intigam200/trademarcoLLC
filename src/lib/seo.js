@@ -60,3 +60,20 @@ export function setNoIndexSEO(title) {
   if (title) document.title = title;
   setMeta("name", "robots", "noindex, follow");
 }
+
+// Injects (or clears, when data is falsy) a page-specific JSON-LD block —
+// e.g. Product or BreadcrumbList schema for the current route. `data` may be
+// a single schema.org object or an array of them. The site-wide Organization
+// schema lives as a static script in index.html since it never changes.
+export function setJSONLD(data) {
+  const existing = document.getElementById("tm-jsonld");
+  if (!data) {
+    existing?.remove();
+    return;
+  }
+  const tag = existing || document.createElement("script");
+  tag.type = "application/ld+json";
+  tag.id = "tm-jsonld";
+  tag.text = JSON.stringify(data);
+  if (!existing) document.head.appendChild(tag);
+}

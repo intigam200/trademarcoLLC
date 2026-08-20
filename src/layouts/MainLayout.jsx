@@ -1,6 +1,7 @@
 import TopBar from "../components/TopBar";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import WhatsAppButton from "../components/WhatsAppButton";
 import { COLORS } from "../theme/colors";
 
 export default function MainLayout({ children }) {
@@ -12,6 +13,7 @@ export default function MainLayout({ children }) {
         {children}
       </main>
       <Footer />
+      <WhatsAppButton />
 
       <style>{`
         .mobile-burger { display: none !important; }

@@ -90,7 +90,7 @@ export default function Manufacturers() {
                     borderRadius: m.logo_dark ? 8 : 0,
                     padding: m.logo_dark ? "8px 14px" : 0,
                   }}>
-                    <img src={m.logo_url} alt={`${m.name} logo`} style={{ maxWidth: 140, maxHeight: m.logo_dark ? 40 : "100%", objectFit: "contain" }} />
+                    <img src={m.logo_url} alt={`${m.name} logo`} loading="lazy" style={{ maxWidth: 140, maxHeight: m.logo_dark ? 40 : "100%", objectFit: "contain" }} />
                   </div>
                 ) : (
                   <div style={{

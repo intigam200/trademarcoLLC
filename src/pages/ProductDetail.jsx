@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
 import { getPublishedProductBySlugs, getRelatedProducts, listProducts } from "../lib/supabase/products";
-import { setSEO, setNoIndexSEO } from "../lib/seo";
+import { setSEO, setNoIndexSEO, setJSONLD, SITE_URL } from "../lib/seo";
 import { Section, SectionLabel, SectionTitle } from "../components/Section";
 import LoadingState from "../components/LoadingState";
 import Icon from "../components/Icon";
@@ -58,16 +58,52 @@ export default function ProductDetail() {
     if (status === "ready" && product) {
       const mfrName = product.manufacturer?.name ?? "";
       const label = [mfrName, product.part_number, product.product_name].filter(Boolean).join(" ");
+      const productPath = `/manufacturers/${manufacturerSlug}/${productSlug}`;
       setSEO({
         title: product.seo_title || `${label} | Trademarco Global`,
         description: product.seo_description || `Buy ${label} from Trademarco Global. Worldwide supplier of industrial automation products. Request a quotation today.`,
         image: product.image_url || undefined,
         type: "product",
-        path: `/manufacturers/${manufacturerSlug}/${productSlug}`,
+        path: productPath,
       });
+
+      setJSONLD([
+        {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.product_name,
+          sku: product.part_number || undefined,
+          description: product.short_description || product.long_description || undefined,
+          image: product.image_url || undefined,
+          url: `${SITE_URL}${productPath}`,
+          brand: mfrName ? { "@type": "Brand", name: mfrName } : undefined,
+          ...(product.price != null ? {
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "USD",
+              price: Number(product.price),
+              availability: "https://schema.org/InStock",
+              url: `${SITE_URL}${productPath}`,
+            },
+          } : {}),
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+            { "@type": "ListItem", position: 2, name: "Manufacturers", item: `${SITE_URL}/manufacturers` },
+            { "@type": "ListItem", position: 3, name: mfrName, item: `${SITE_URL}/manufacturers/${manufacturerSlug}` },
+            { "@type": "ListItem", position: 4, name: product.product_name, item: `${SITE_URL}${productPath}` },
+          ],
+        },
+      ]);
     } else if (status === "not-found") {
       setNoIndexSEO("Product Not Found | Trademarco Global");
+      setJSONLD(null);
     }
+
+    return () => setJSONLD(null);
   }, [status, product, manufacturerSlug, productSlug]);
 
   const handleBack = () => {

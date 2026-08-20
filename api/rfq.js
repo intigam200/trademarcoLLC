@@ -6,6 +6,29 @@ import { buildNotificationEmail, buildConfirmationEmail } from "./_lib/rfqEmails
 
 const SALES_RECIPIENT = "sales@trademarco.com";
 
+// Honeypot + Turnstile stop bots, but a determined human (or a bot that
+// solves Turnstile) could still hammer the endpoint from one IP. Cap it
+// using the submission history already stored in `rfqs` — no separate store
+// needed. Fails open on a lookup error so a Supabase hiccup never blocks a
+// legitimate customer.
+const RATE_LIMIT_WINDOW_MINUTES = 10;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+
+async function isRateLimited(supabase, ip) {
+  if (!ip) return false;
+  const cutoff = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+  const { count, error } = await supabase
+    .from("rfqs")
+    .select("id", { count: "exact", head: true })
+    .eq("ip_address", ip)
+    .gte("created_at", cutoff);
+  if (error) {
+    console.error("RFQ rate limit check failed, allowing request:", error.message);
+    return false;
+  }
+  return (count ?? 0) >= RATE_LIMIT_MAX_REQUESTS;
+}
+
 const MAX_LEN = {
   name: 200, company: 200, email: 254, phone: 50, country: 100,
   product: 200, partNumber: 100, message: 5000, pageUrl: 500,
@@ -122,17 +145,21 @@ export default async function handler(req, res) {
 
   const ip = getClientIp(req);
 
-  const spamCheckPassed = await verifyTurnstile(fields.turnstileToken, ip);
-  if (!spamCheckPassed) {
-    return res.status(403).json({ error: "Spam verification failed. Please refresh the page and try again." });
-  }
-
   let supabase;
   try {
     supabase = getSupabaseAdmin();
   } catch (err) {
     console.error("RFQ submission failed — Supabase admin client unavailable:", err.message);
     return res.status(500).json({ error: "We couldn't process your request right now. Please try again shortly." });
+  }
+
+  if (await isRateLimited(supabase, ip)) {
+    return res.status(429).json({ error: "Too many requests submitted recently. Please wait a few minutes and try again, or email us directly at sales@trademarco.com." });
+  }
+
+  const spamCheckPassed = await verifyTurnstile(fields.turnstileToken, ip);
+  if (!spamCheckPassed) {
+    return res.status(403).json({ error: "Spam verification failed. Please refresh the page and try again." });
   }
 
   // If this RFQ references a catalog product, trust the database's current
