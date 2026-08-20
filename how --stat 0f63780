@@ -1,0 +1,23 @@
+[33mcommit 0f63780d373c816aaa46f9d4b22296a5decabde3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: intigam200 <intigam200@users.noreply.github.com>
+Date:   Thu Aug 20 13:27:58 2026 +0300
+
+    Update TradeMarco
+
+ api/rfq.js                        |  37 [32m+++++++[m[31m-[m
+ index.html                        |  24 [32m+++++[m
+ public/manifest.json              |  13 [32m+++[m
+ public/vite.svg                   |   1 [31m-[m
+ src/App.jsx                       |   2 [32m+[m
+ src/components/ContactForm.jsx    |  49 [32m+[m[31m---------[m
+ src/components/ScrollToTop.jsx    |  16 [32m++++[m
+ src/components/WhatsAppButton.jsx |  39 [32m++++++++[m
+ src/layouts/MainLayout.jsx        |   2 [32m+[m
+ src/lib/seo.js                    |  17 [32m++++[m
+ src/pages/Home.jsx                |  65 [32m+++++++++++[m[31m--[m
+ src/pages/ManufacturerDetail.jsx  |  42 [32m++++++++[m[31m-[m
+ src/pages/Manufacturers.jsx       |   2 [32m+[m[31m-[m
+ src/pages/ProductDetail.jsx       |  40 [32m+++++++[m[31m-[m
+ src/pages/Products.jsx            | 190 [32m+++++++++++++++++++++++++++++++[m[31m-------[m
+ vercel.json                       |  18 [32m++++[m
+ 16 files changed, 458 insertions(+), 99 deletions(-)
