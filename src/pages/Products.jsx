@@ -87,8 +87,9 @@ export default function Products() {
 
   // Sitewide product search — independent of the category browser below.
   // Debounced so we don't fire a query on every keystroke, and only kicks in
-  // once there's enough text to make a search meaningful.
-  const [searchInput, setSearchInput] = useState("");
+  // once there's enough text to make a search meaningful. Seeded from ?q=
+  // so a search started in the navbar lands here pre-filled.
+  const [searchInput, setSearchInput] = useState(() => searchParams.get("q") || "");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -166,6 +167,7 @@ export default function Products() {
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by product name or part number…"
                 aria-label="Search products"
+                className="tm-products-search-input"
                 style={{
                   width: "100%", padding: "13px 16px 13px 44px", fontSize: 14, fontFamily: "inherit",
                   border: "1px solid rgba(255,255,255,0.18)", borderRadius: 4, outline: "none",
@@ -188,6 +190,9 @@ export default function Products() {
             </div>
           </div>
         </div>
+        <style>{`
+          .tm-products-search-input:focus { border-color: ${COLORS.orange}; box-shadow: 0 0 0 3px rgba(232,124,48,0.35); }
+        `}</style>
       </section>
 
       {/* ── BREADCRUMB ── */}

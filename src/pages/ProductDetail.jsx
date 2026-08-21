@@ -8,6 +8,7 @@ import LoadingState from "../components/LoadingState";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 import ContactForm from "../components/ContactForm";
+import { useQuoteList } from "../context/QuoteListContext";
 
 export default function ProductDetail() {
   const { manufacturerSlug, productSlug } = useParams();
@@ -34,6 +35,7 @@ export default function ProductDetail() {
   }, [manufacturerSlug, productSlug]);
 
   const { status, product, related } = state;
+  const { addItem, removeItem, has } = useQuoteList();
 
   // Previous/Next — stable alphabetical-by-part-number order within the same
   // manufacturer, so the sequence doesn't shuffle as products are edited.
@@ -291,6 +293,36 @@ export default function ProductDetail() {
 
           <div>
             <div style={{ position: "sticky", top: 100, display: "flex", flexDirection: "column", gap: 20 }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (has(product.id)) {
+                    removeItem(product.id);
+                  } else {
+                    addItem({
+                      productId: product.id,
+                      manufacturerName,
+                      productName: product.product_name,
+                      partNumber: product.part_number,
+                      imageUrl: product.image_url || null,
+                      manufacturerSlug,
+                      slug: product.slug,
+                    });
+                  }
+                }}
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                {has(product.id) ? (
+                  <>
+                    <Icon type="check" size={18} color={COLORS.navy} /> Added to Quote List — Remove
+                  </>
+                ) : (
+                  <>
+                    <Icon type="clipboard" size={18} color={COLORS.navy} /> Add to Quote List
+                  </>
+                )}
+              </Button>
+
               {product.datasheet_url && (
                 <a
                   href={product.datasheet_url}

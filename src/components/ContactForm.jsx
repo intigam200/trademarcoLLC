@@ -59,13 +59,14 @@ function TextField({ id, label, required, optionalHint, error, textarea, inputRe
   );
 }
 
-export default function ContactForm({ productId = null, manufacturerName = "", productName = "", partNumber = "", initialMessage = "" }) {
-  const isProductContext = Boolean(productId);
+export default function ContactForm({ productId = null, manufacturerName = "", productName = "", partNumber = "", initialMessage = "", items = null, onSubmitted = null }) {
+  const isMultiItem = Array.isArray(items) && items.length > 0;
+  const isProductContext = Boolean(productId) || isMultiItem;
 
   const initialForm = {
     name: "", company: "", email: "", phone: "", country: "",
-    product: isProductContext ? productName : "",
-    partNumber: isProductContext ? partNumber : "",
+    product: isMultiItem ? `Quote request for ${items.length} item${items.length > 1 ? "s" : ""}` : (isProductContext ? productName : ""),
+    partNumber: isMultiItem ? "" : (isProductContext ? partNumber : ""),
     message: initialMessage,
     website: "", // honeypot — never shown, never filled by real visitors
   };
@@ -127,6 +128,19 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
     setStatus("sending");
     setErrorMsg("");
 
+    // Multi-item mode has no single product to attach — instead the full
+    // itemized list is folded into the message, and the request is
+    // submitted through the same /api/rfq endpoint as any other RFQ.
+    const itemsListText = isMultiItem
+      ? items.map((it, i) => `${i + 1}. ${[it.manufacturerName, it.productName, it.partNumber ? `(Part# ${it.partNumber})` : null].filter(Boolean).join(" — ")}`).join("\n")
+      : "";
+    const combinedMessage = isMultiItem
+      ? [`Requested items:\n${itemsListText}`, form.message.trim()].filter(Boolean).join("\n\n")
+      : form.message.trim();
+    const combinedManufacturerName = isMultiItem
+      ? [...new Set(items.map((it) => it.manufacturerName).filter(Boolean))].join(", ")
+      : manufacturerName;
+
     try {
       const res = await fetch("/api/rfq", {
         method: "POST",
@@ -139,10 +153,10 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
           country: form.country.trim(),
           product: form.product.trim(),
           partNumber: form.partNumber.trim(),
-          message: form.message.trim(),
+          message: combinedMessage,
           website: form.website,
-          productId,
-          manufacturerName,
+          productId: isMultiItem ? null : productId,
+          manufacturerName: combinedManufacturerName,
           pageUrl: typeof window !== "undefined" ? window.location.href : "",
           turnstileToken,
         }),
@@ -157,6 +171,7 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
       setStatus("sent");
       setErrors({});
       setRequestId(data.requestId || "");
+      onSubmitted?.();
 
       // Conversion tracking — no-op until Google Analytics (gtag.js) is
       // actually installed on the site; wired up now so it activates
@@ -229,7 +244,21 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
 
-      {isProductContext && (
+      {isMultiItem ? (
+        <div style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 6, padding: "10px 14px" }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 6 }}>
+            Requesting a Quote For {items.length} Item{items.length > 1 ? "s" : ""}
+          </div>
+          <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 4, maxHeight: 140, overflowY: "auto" }}>
+            {items.map((it) => (
+              <li key={it.productId} style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy }}>
+                {it.productName}{it.partNumber ? ` — ${it.partNumber}` : ""}
+                {it.manufacturerName && <span style={{ color: COLORS.medGray, fontWeight: 400 }}> ({it.manufacturerName})</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : isProductContext && (
         <div style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 6, padding: "10px 14px" }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 3 }}>
             Requesting a Quote For

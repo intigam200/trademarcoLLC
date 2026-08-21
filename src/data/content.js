@@ -58,7 +58,7 @@ export const HERO_TRUST = [
 export const REGIONS = [
   { region: "North America", detail: "USA, Canada, Mexico", icon: "earth-americas" },
   { region: "Europe", detail: "Germany, Italy, UK, Spain", icon: "earth-europe" },
-  { region: "Middle East", detail: "UAE, Saudi Arabia, Turkey", icon: "compass" },
+  { region: "Middle East", detail: "UAE, Saudi Arabia, Turkey", icon: "earth-europe" },
   { region: "Asia-Pacific", detail: "China, India, South Korea, Japan", icon: "earth-asia" },
 ];
 
