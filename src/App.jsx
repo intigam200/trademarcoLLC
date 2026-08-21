@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import ScrollToTop from "./components/ScrollToTop";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
@@ -54,6 +55,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <Analytics />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
