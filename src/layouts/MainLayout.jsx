@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import WhatsAppButton from "../components/WhatsAppButton";
 import { COLORS } from "../theme/colors";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function MainLayout({ children }) {
   return (
@@ -14,6 +15,7 @@ export default function MainLayout({ children }) {
       </main>
       <Footer />
       <WhatsAppButton />
+      <Analytics />
 
       <style>{`
         .mobile-burger { display: none !important; }
