@@ -69,37 +69,35 @@ export default function ProductDetail() {
         path: productPath,
       });
 
-      setJSONLD([
-        {
-          "@context": "https://schema.org",
-          "@type": "Product",
+      // ItemPage + IndividualProduct instead of Product — this is a B2B
+      // request-a-quote catalog with no published prices, and a bare Product
+      // schema without offers/review/aggregateRating trips Search Console's
+      // structured-data validator. ItemPage has no such requirement.
+      setJSONLD({
+        "@context": "https://schema.org",
+        "@type": "ItemPage",
+        name: product.product_name,
+        description: product.short_description || product.long_description || undefined,
+        url: `${SITE_URL}${productPath}`,
+        breadcrumb: {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+            { "@type": "ListItem", position: 2, name: mfrName, item: `${SITE_URL}/manufacturers/${manufacturerSlug}` },
+            { "@type": "ListItem", position: 3, name: product.product_name },
+          ],
+        },
+        mainEntity: {
+          "@type": "IndividualProduct",
           name: product.product_name,
           sku: product.part_number || undefined,
           description: product.short_description || product.long_description || undefined,
           image: product.image_url || undefined,
-          url: `${SITE_URL}${productPath}`,
           brand: mfrName ? { "@type": "Brand", name: mfrName } : undefined,
-          ...(product.price != null ? {
-            offers: {
-              "@type": "Offer",
-              priceCurrency: "USD",
-              price: Number(product.price),
-              availability: "https://schema.org/InStock",
-              url: `${SITE_URL}${productPath}`,
-            },
-          } : {}),
+          manufacturer: mfrName ? { "@type": "Organization", name: mfrName } : undefined,
+          category: product.category?.name || undefined,
         },
-        {
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-            { "@type": "ListItem", position: 2, name: "Manufacturers", item: `${SITE_URL}/manufacturers` },
-            { "@type": "ListItem", position: 3, name: mfrName, item: `${SITE_URL}/manufacturers/${manufacturerSlug}` },
-            { "@type": "ListItem", position: 4, name: product.product_name, item: `${SITE_URL}${productPath}` },
-          ],
-        },
-      ]);
+      });
     } else if (status === "not-found") {
       setNoIndexSEO("Product Not Found | Trademarco Global");
       setJSONLD(null);
