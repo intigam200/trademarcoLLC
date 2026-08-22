@@ -1,14 +1,10 @@
-// trademarco.com's DNS isn't pointed at this deployment yet (see
-// src/lib/seo.js for the full explanation), so absolute asset URLs (the
-// logo embedded in this email) use the real, currently-working deployment
-// URL instead. Set SITE_URL once the domain's DNS is fixed.
-const SITE_URL = process.env.SITE_URL || "https://trademarco-llc.vercel.app";
+const SITE_URL = process.env.SITE_URL || "https://www.trademarco.com";
 const LOGO_URL = `${SITE_URL}/images/products/logo.png`;
 
 const COMPANY_LEGAL_NAME = "TRADEMARCO LLC";
 const COMPANY_ADDRESS = "30 N Gould St Ste N, Sheridan, WY 82801, USA";
 const COMPANY_WEBSITE_LABEL = "www.trademarco.com";
-const COMPANY_WEBSITE_URL = "https://trademarco.com";
+const COMPANY_WEBSITE_URL = "https://www.trademarco.com";
 const COMPANY_PHONE = "+1 (307) 999-8667";
 const COMPANY_WHATSAPP_URL = "https://wa.me/13079998667";
 const COMPANY_LINKEDIN_URL = "https://linkedin.com/company/trademarco";
