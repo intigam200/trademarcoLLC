@@ -5,6 +5,12 @@
   ],
   "headers": [
     {
+      "source": "/favicon.ico",
+      "headers": [
+        { "key": "Content-Type", "value": "image/png" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
