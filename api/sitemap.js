@@ -2,11 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 
 const SITE_URL = process.env.SITE_URL || "https://www.trademarco.com";
 
-function urlEntry({ loc, lastmod, priority }) {
+function urlEntry({ loc, lastmod, changefreq, priority }) {
   return [
     "  <url>",
     `    <loc>${SITE_URL}${loc}</loc>`,
     lastmod ? `    <lastmod>${new Date(lastmod).toISOString().slice(0, 10)}</lastmod>` : null,
+    changefreq ? `    <changefreq>${changefreq}</changefreq>` : null,
     `    <priority>${priority}</priority>`,
     "  </url>",
   ].filter(Boolean).join("\n");
@@ -24,17 +25,17 @@ export default async function handler(req, res) {
     ]);
 
     const urls = [
-      { loc: "/", priority: "1.0" },
-      { loc: "/company", priority: "0.5" },
-      { loc: "/products", priority: "0.8" },
-      { loc: "/manufacturers", priority: "0.8" },
-      { loc: "/privacy-policy", priority: "0.3" },
-      { loc: "/terms-of-service", priority: "0.3" },
-      { loc: "/cookie-policy", priority: "0.3" },
-      ...(manufacturers ?? []).map((m) => ({ loc: `/manufacturers/${m.slug}`, lastmod: m.updated_at, priority: "0.7" })),
+      { loc: "/", changefreq: "daily", priority: "1.0" },
+      { loc: "/company", changefreq: "monthly", priority: "0.5" },
+      { loc: "/products", changefreq: "daily", priority: "0.8" },
+      { loc: "/manufacturers", changefreq: "weekly", priority: "0.8" },
+      { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
+      { loc: "/terms-of-service", changefreq: "yearly", priority: "0.3" },
+      { loc: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
+      ...(manufacturers ?? []).map((m) => ({ loc: `/manufacturers/${m.slug}`, lastmod: m.updated_at, changefreq: "weekly", priority: "0.7" })),
       ...(products ?? [])
         .filter((p) => p.manufacturer?.slug)
-        .map((p) => ({ loc: `/manufacturers/${p.manufacturer.slug}/${p.slug}`, lastmod: p.updated_at, priority: "0.6" })),
+        .map((p) => ({ loc: `/manufacturers/${p.manufacturer.slug}/${p.slug}`, lastmod: p.updated_at, changefreq: "weekly", priority: "0.6" })),
     ];
 
     const body = urls.map(urlEntry).join("\n");
