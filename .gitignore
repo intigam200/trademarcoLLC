@@ -31,3 +31,7 @@ dist-ssr
 
 .vercel
 .env*
+
+# Google Indexing API credentials & local run state — never commit
+service-account*.json
+scripts/.index-urls-state.json
