@@ -35,3 +35,7 @@ dist-ssr
 # Google Indexing API credentials & local run state — never commit
 service-account*.json
 scripts/.index-urls-state.json
+
+# Private keys / certificates — never commit
+*.pem
+*.key
