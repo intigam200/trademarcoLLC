@@ -7,7 +7,7 @@ const COMPANY_WEBSITE_LABEL = "www.trademarco.com";
 const COMPANY_WEBSITE_URL = "https://www.trademarco.com";
 const COMPANY_PHONE = "+1 (307) 999-8667";
 const COMPANY_WHATSAPP_URL = "https://wa.me/13079998667";
-const COMPANY_LINKEDIN_URL = "https://linkedin.com/company/trademarco";
+const COMPANY_LINKEDIN_URL = "https://www.linkedin.com/company/trademarco-llc/";
 const SALES_EMAIL = "sales@trademarco.com";
 
 const NAVY = "#1B2A4A";

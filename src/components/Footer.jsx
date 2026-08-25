@@ -19,7 +19,7 @@ const CONTACT_ROWS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: "linkedin", label: "LinkedIn", href: "https://linkedin.com/company/trademarco" },
+  { icon: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com/company/trademarco-llc/" },
 ];
 
 function FooterHeading({ children }) {
