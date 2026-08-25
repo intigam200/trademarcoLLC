@@ -91,8 +91,16 @@ export default function Footer() {
           {/* RIGHT — headquarters map */}
           <div className="tm-footer-hq">
             <FooterHeading>Our Headquarters</FooterHeading>
-            <div className="tm-footer-map" style={{ position: "relative" }}>
-              <img src="/images/products/US.png" alt="Map of the United States" style={{ width: "100%", maxWidth: 600, borderRadius: 8, display: "block" }} />
+            <div className="tm-footer-map" style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+              <iframe
+                title="Trademarco Global headquarters — Sheridan, Wyoming"
+                src="https://maps.google.com/maps?q=30%20N%20Gould%20St%20Ste%20N%2C%20Sheridan%2C%20WY%2082801%2C%20USA&z=14&output=embed"
+                width="100%"
+                height="220"
+                style={{ border: 0, maxWidth: 600, display: "block" }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginTop: 16 }}>
               
