@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { COLORS } from "../theme/colors";
 import { NAV_LINKS } from "../data/content";
 import { listManufacturers } from "../lib/supabase/manufacturers";
@@ -59,6 +59,7 @@ function MegaMenu({ label, manufacturers, categories }) {
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileNav, setMobileNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState(null); // label of the mega-menu currently open, or null
@@ -147,16 +148,15 @@ export default function Navbar() {
         <div style={{ display: "flex", alignItems: "center", gap: 28 }} className="desktop-nav">
           {NAV_LINKS.map((l) => {
             const hasMegaMenu = MEGA_MENU_ITEMS.has(l.label);
-            const linkEl = l.href.includes("#") ? (
-              <a href={l.href} style={{ color: "rgba(255,255,255,0.8)", fontSize: 14, fontWeight: 500, textDecoration: "none", transition: "color 0.15s", display: "flex", alignItems: "center", gap: 4 }}
-                onMouseEnter={e => e.target.style.color = COLORS.white}
-                onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.8)"}>
+            const isRoute = !l.href.includes("#");
+            const isActive = isRoute && location.pathname === l.href;
+            const navLinkClass = `tm-nav-link${isActive ? " tm-nav-link-active" : ""}`;
+            const linkEl = !isRoute ? (
+              <a href={l.href} className={navLinkClass} style={{ fontSize: 14, fontWeight: 500, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
                 {l.label}
               </a>
             ) : (
-              <Link to={l.href} style={{ color: "rgba(255,255,255,0.8)", fontSize: 14, fontWeight: 500, textDecoration: "none", transition: "color 0.15s", display: "flex", alignItems: "center", gap: 4 }}
-                onMouseEnter={e => e.target.style.color = COLORS.white}
-                onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.8)"}>
+              <Link to={l.href} className={navLinkClass} style={{ fontSize: 14, fontWeight: 500, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
                 {l.label}
                 {hasMegaMenu && <Icon type="chevron-down" size={12} color="rgba(255,255,255,0.5)" />}
               </Link>
@@ -327,6 +327,19 @@ export default function Navbar() {
       <QuoteListPanel open={quoteListOpen} onClose={() => setQuoteListOpen(false)} />
 
       <style>{`
+        .tm-nav-link {
+          position: relative; color: rgba(255,255,255,0.8); padding-bottom: 6px;
+          transition: color 0.2s ease;
+        }
+        .tm-nav-link::after {
+          content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+          height: 2px; background: ${COLORS.white};
+          transform: scaleX(0); transform-origin: center;
+          transition: transform 0.3s ease;
+        }
+        .tm-nav-link:hover { color: ${COLORS.white}; }
+        .tm-nav-link:hover::after, .tm-nav-link-active::after { transform: scaleX(1); }
+
         .tm-navbar-icon-btn { border-radius: 6px; transition: background 0.15s ease; }
         .tm-navbar-icon-btn:hover { background: rgba(255,255,255,0.08); }
         .tm-navbar-icon-btn:focus-visible { outline: 2px solid ${COLORS.orange}; outline-offset: 2px; }
@@ -334,22 +347,26 @@ export default function Navbar() {
         .tm-mega-menu {
           /* flush against the nav link (no margin-top gap) — a gap here would
              sit outside the hoverable wrapper's box and close the menu the
-             instant the cursor crosses it on the way down to an item */
+             instant the cursor crosses it on the way down to an item. Padding
+             (not margin) doubles as the invisible hover bridge: it's part of
+             this element's own box, so the wrapper's mouseenter/mouseleave
+             never sees a dead zone between the link and the menu content. */
           position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
           padding-top: 14px; width: 320px; max-width: 80vw;
           background: ${COLORS.white}; background-clip: padding-box;
-          border-radius: 8px; box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+          border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
           padding-left: 16px; padding-right: 16px; padding-bottom: 16px;
+          overflow: visible;
           z-index: 110;
-          animation: tm-mega-fade 0.15s ease;
+          animation: tm-mega-fade 0.25s ease;
         }
-        @keyframes tm-mega-fade { from { opacity: 0; transform: translateX(-50%) translateY(-4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes tm-mega-fade { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         .tm-mega-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 240px; overflow-y: auto; }
         .tm-mega-menu-item {
           display: block; padding: 8px 10px; font-size: 13px; font-weight: 600; color: ${COLORS.navy};
-          text-decoration: none; border-radius: 4px; transition: background 0.15s ease;
+          text-decoration: none; border-radius: 4px; transition: background 0.15s ease, padding-left 0.15s ease;
         }
-        .tm-mega-menu-item:hover { background: ${COLORS.lightGray}; color: ${COLORS.orange}; }
+        .tm-mega-menu-item:hover { background: ${COLORS.lightGray}; color: ${COLORS.orange}; padding-left: 14px; }
         .tm-mega-menu-empty { font-size: 13px; color: ${COLORS.medGray}; padding: 8px 10px; }
         .tm-mega-menu-viewall {
           display: flex; align-items: center; gap: 6px; margin-top: 12px; padding-top: 12px;
