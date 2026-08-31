@@ -51,7 +51,7 @@ export default function Home() {
             as a cropped rectangle; the image itself stays sharp and true to color. */}
         <div className="tm-hero-photo" style={{
           position: "absolute", top: 0, bottom: 0, right: 0, width: "80%",
-          backgroundImage: "url(/images/products/port1.png)",
+          backgroundImage: "url(/images/products/port1.webp)",
           backgroundSize: "cover", backgroundPosition: "center",
           filter: "brightness(1)",
           maskImage: "linear-gradient(90deg, transparent 0%, transparent 4%, black 28%)",
@@ -242,7 +242,7 @@ export default function Home() {
                 Our sourcing capabilities cover the critical industries that keep global infrastructure running.
               </SectionDesc>
             </div>
-            <img src="/images/products/shipment.png" alt="Global shipping" className="tm-ind-header-img" style={{
+            <img src="/images/products/shipment.webp" alt="Global shipping" className="tm-ind-header-img" style={{
               width: 570, maxWidth: "75%", height: 240, objectFit: "cover", borderRadius: 'none',
               boxShadow: 'none', flexShrink: 0,
               maskImage: "radial-gradient(ellipse at center, black 55%, transparent 95%)",
@@ -360,7 +360,7 @@ export default function Home() {
 
       {/* ── GLOBAL SUPPLY NETWORK ── */}
       <Section id="network" bg={COLORS.navy} style={{
-        backgroundImage: "linear-gradient(rgba(27,42,74,0.75), rgba(27,42,74,0.75)), url('/images/products/world.png')",
+        backgroundImage: "linear-gradient(rgba(27,42,74,0.75), rgba(27,42,74,0.75)), url('/images/products/world.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center center",
       }}>
@@ -412,7 +412,7 @@ export default function Home() {
         <div className="tm-about-ship-img" style={{
           position: "absolute", left: 0, bottom: 0,
           width: "clamp(320px, 42vw, 700px)", height: "clamp(160px, 20vw, 250px)",
-          backgroundImage: "url('/images/products/port.png')",
+          backgroundImage: "url('/images/products/port.webp')",
           backgroundSize: "cover", backgroundPosition: "center",
           maskImage: "radial-gradient(circle at 0% 100%, black 15%, transparent 70%)",
           WebkitMaskImage: "radial-gradient(circle at 0% 100%, black 15%, transparent 70%)",
@@ -447,7 +447,7 @@ export default function Home() {
 
             {/* RIGHT — How We Work card */}
             <div style={{ background: COLORS.white, borderRadius: 12, boxShadow: "0 4px 24px rgba(0,0,0,0.06)", padding: 40 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>How We Work</h4>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>How We Work</h3>
               <div style={{ width: 40, height: 3, background: COLORS.orange, margin: "12px 0 32px" }} />
               {HOW_WE_WORK.map((s, i) => (
                 <div key={i} className="tm-hover-icon" style={{ display: "flex", gap: 16, alignItems: "flex-start", position: "relative", paddingBottom: i < HOW_WE_WORK.length - 1 ? 32 : 0 }}>
@@ -463,7 +463,7 @@ export default function Home() {
                     <Icon type={s.icon} size={26} color={COLORS.medGray} />
                   </div>
                   <div style={{ paddingTop: 4 }}>
-                    <h5 style={{ fontSize: 17, fontWeight: 700, color: COLORS.navy, margin: "0 0 4px" }}>{s.title}</h5>
+                    <h4 style={{ fontSize: 17, fontWeight: 700, color: COLORS.navy, margin: "0 0 4px" }}>{s.title}</h4>
                     <p style={{ fontSize: 14, lineHeight: 1.55, color: COLORS.medGray, margin: 0 }}>{s.text}</p>
                   </div>
                 </div>
