@@ -23,15 +23,6 @@ export default async function handler(req, res) {
   if (!apiKey || !cx) {
     return res.status(500).json({ error: "Image search isn't configured yet (missing GOOGLE_CSE_API_KEY / GOOGLE_CSE_CX)." });
   }
-  if (req.query?.debug === "1") {
-    return res.status(200).json({
-      keyLength: apiKey.length,
-      keyLooksLikeGoogleFormat: /^AIza[0-9A-Za-z_-]{35}$/.test(apiKey.trim()),
-      keyHasWhitespace: apiKey !== apiKey.trim(),
-      cxLength: cx.length,
-      cxHasWhitespace: cx !== cx.trim(),
-    });
-  }
 
   const url = new URL("https://www.googleapis.com/customsearch/v1");
   url.searchParams.set("key", apiKey);
