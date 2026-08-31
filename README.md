@@ -43,3 +43,26 @@ node scripts/index-urls.js --reset          # forget submission history, resend 
 ```
 
 Google's Indexing API allows 200 publish requests/day by default. The script tracks which URLs have already been submitted successfully in `scripts/.index-urls-state.json` (also gitignored), so if the sitemap has more than 200 URLs, running it again on a later day automatically continues with whatever wasn't sent yet — no need to track progress manually.
+
+## Admin product image search
+
+The "Search Images" button in the admin product editor (`/admin/products/:id/edit`) searches Google Images for a product photo, so you don't have to leave the admin panel to find and download one. Whatever you pick — or manually upload — is automatically resized and re-encoded to WebP before it's stored, so product photos don't hit the site at their original, often multi-megabyte size.
+
+### 1. Enable the Custom Search API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select the same project used for the Indexing API above (or create one).
+2. **APIs & Services → Library** → search **"Custom Search API"** → **Enable**.
+3. **APIs & Services → Credentials → Create Credentials → API key**. Copy the key — this is `GOOGLE_CSE_API_KEY`.
+
+### 2. Create a Programmable Search Engine
+
+1. Go to [Programmable Search Engine](https://programmablesearchengine.google.com/) → **Add**.
+2. Under "What to search", choose **Search the entire web**.
+3. Once created, open its settings and turn **Image search** on.
+4. Copy the **Search engine ID** — this is `GOOGLE_CSE_CX`.
+
+### 3. Add the environment variables
+
+Add `GOOGLE_CSE_API_KEY` and `GOOGLE_CSE_CX` to `.env` locally and to Vercel's Environment Variables (Production + Preview) — see `.env.example`. Both are server-only; the browser never sees them, only the admin's own `/api/admin/*` routes do.
+
+The free tier is 100 search queries/day; each one lists up to 10 image results, so it comfortably covers day-to-day catalog work. Past that, Google bills per additional 1,000 queries.

@@ -13,6 +13,7 @@ import PageHeader from "../components/PageHeader";
 import AdminCard from "../components/AdminCard";
 import { FormField, inputStyle } from "../components/FormField";
 import TagInput from "../components/TagInput";
+import ImageSearchModal from "../components/ImageSearchModal";
 import Icon from "../../components/Icon";
 import Button from "../../components/Button";
 
@@ -39,6 +40,7 @@ export default function ProductEditor() {
   const [saveMessage, setSaveMessage] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingDatasheet, setUploadingDatasheet] = useState(false);
+  const [imageSearchOpen, setImageSearchOpen] = useState(false);
 
   useEffect(() => {
     document.title = `${isEditing ? "Edit" : "Add"} Product | Trademarco Global Admin`;
@@ -292,16 +294,22 @@ export default function ProductEditor() {
 
           <AdminCard title="Media">
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <FormField label="Product Image">
-                <label style={{
-                  display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: `1.5px dashed ${ADMIN_COLORS.border}`,
-                  borderRadius: 6, cursor: uploadingImage ? "default" : "pointer", fontSize: 13, color: ADMIN_COLORS.medGray,
-                }}>
-                  <Icon type="upload" size={16} color={ADMIN_COLORS.medGray} />
-                  {uploadingImage ? "Uploading…" : form.imageUrl ? "Image uploaded — choose to replace" : "Choose image file…"}
-                  <input type="file" accept="image/*" style={{ display: "none" }} disabled={uploadingImage}
-                    onChange={(e) => handleImageUpload(e.target.files?.[0])} />
-                </label>
+              <FormField label="Product Image" hint="Uploads and search results are automatically resized and re-encoded to WebP.">
+                <div style={{ display: "flex", gap: 8 }}>
+                  <label style={{
+                    display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: `1.5px dashed ${ADMIN_COLORS.border}`,
+                    borderRadius: 6, cursor: uploadingImage ? "default" : "pointer", fontSize: 13, color: ADMIN_COLORS.medGray, flex: 1,
+                  }}>
+                    <Icon type="upload" size={16} color={ADMIN_COLORS.medGray} />
+                    {uploadingImage ? "Uploading…" : form.imageUrl ? "Image uploaded — choose to replace" : "Choose image file…"}
+                    <input type="file" accept="image/*" style={{ display: "none" }} disabled={uploadingImage}
+                      onChange={(e) => handleImageUpload(e.target.files?.[0])} />
+                  </label>
+                  <Button variant="outline" type="button" disabled={uploadingImage} onClick={() => setImageSearchOpen(true)} style={{ padding: "0 16px", fontSize: 13, whiteSpace: "nowrap" }}>
+                    <Icon type="search" size={15} color={ADMIN_COLORS.navy} />
+                    Search Images
+                  </Button>
+                </div>
                 {form.imageUrl && (
                   <img src={form.imageUrl} alt="Product preview" style={{ marginTop: 10, maxHeight: 100, borderRadius: 6, border: `1px solid ${ADMIN_COLORS.border}` }} />
                 )}
@@ -372,6 +380,14 @@ export default function ProductEditor() {
           </AdminCard>
         </div>
       </div>
+
+      {imageSearchOpen && (
+        <ImageSearchModal
+          initialQuery={[selectedManufacturer?.name, form.partNumber].filter(Boolean).join(" ")}
+          onSelect={(url) => { setForm((f) => ({ ...f, imageUrl: url })); setImageSearchOpen(false); }}
+          onClose={() => setImageSearchOpen(false)}
+        />
+      )}
 
       <style>{`
         @media (max-width: 1000px) {
