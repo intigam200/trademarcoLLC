@@ -167,7 +167,7 @@ export default function Home() {
               <div style={{ width: 56, height: 56, borderRadius: "50%", background: COLORS.iconBlueBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon type={b.icon} size={24} color={COLORS.iconBlue} />
               </div>
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, margin: "14px 0 6px" }}>{b.title}</h4>
+              <p style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, margin: "14px 0 6px" }}>{b.title}</p>
               <p style={{ fontSize: 13, lineHeight: 1.55, color: COLORS.medGray, margin: 0 }}>{b.desc}</p>
             </div>
           ))}
@@ -349,7 +349,7 @@ export default function Home() {
                   <Icon type="check" size={20} color={COLORS.orange} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>{item.title}</h4>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, margin: "0 0 6px" }}>{item.title}</p>
                   <p style={{ fontSize: 14, lineHeight: 1.65, color: COLORS.medGray, margin: 0 }}>{item.desc}</p>
                 </div>
               </div>
@@ -438,7 +438,7 @@ export default function Home() {
                 {ABOUT_FEATURES.map((f, i) => (
                   <div key={i} className="tm-hover-icon">
                     <Icon type={f.icon} size={36} color={COLORS.orange} />
-                    <h5 style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, margin: "12px 0 4px" }}>{f.title}</h5>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, margin: "12px 0 4px" }}>{f.title}</p>
                     <p style={{ fontSize: 12, lineHeight: 1.5, color: COLORS.medGray, margin: 0 }}>{f.desc}</p>
                   </div>
                 ))}

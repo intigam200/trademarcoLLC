@@ -112,13 +112,13 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 48, padding: "24px 0 32px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>© 2026 TRADEMARCO LLC. All rights reserved.</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>© 2026 TRADEMARCO LLC. All rights reserved.</span>
           <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-            <Link to="/privacy-policy" style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy Policy</Link>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>|</span>
-            <Link to="/terms-of-service" style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms of Service</Link>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>|</span>
-            <Link to="/cookie-policy" style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Cookie Policy</Link>
+            <Link to="/privacy-policy" style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Privacy Policy</Link>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>|</span>
+            <Link to="/terms-of-service" style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Terms of Service</Link>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>|</span>
+            <Link to="/cookie-policy" style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Cookie Policy</Link>
           </div>
         </div>
       </div>

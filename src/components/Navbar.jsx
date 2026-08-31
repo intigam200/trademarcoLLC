@@ -288,7 +288,13 @@ export default function Navbar() {
               </span>
             )}
           </button>
-          <button onClick={() => setMobileNav(!mobileNav)} className="mobile-burger" style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+          <button
+            onClick={() => setMobileNav(!mobileNav)}
+            className="mobile-burger"
+            aria-label={mobileNav ? "Close menu" : "Open menu"}
+            aria-expanded={mobileNav}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}
+          >
             <Icon type={mobileNav ? "close" : "menu"} size={28} color={COLORS.white} />
           </button>
         </div>
