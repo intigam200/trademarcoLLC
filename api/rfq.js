@@ -102,8 +102,16 @@ async function sendEmails(rfq) {
     transporter.sendMail({ from, to: rfq.email, subject: confirmation.subject, html: confirmation.html, text: confirmation.text }),
   ]);
   results.forEach((r, i) => {
+    const label = i === 0 ? "sales notification" : "customer confirmation";
     if (r.status === "rejected") {
-      console.error(`RFQ ${i === 0 ? "sales notification" : "customer confirmation"} email failed for ${rfq.id}:`, r.reason?.message || r.reason);
+      console.error(`RFQ ${label} email failed for ${rfq.id}:`, r.reason?.message || r.reason);
+    } else if (process.env.RFQ_EMAIL_DEBUG === "1") {
+      console.log(`RFQ ${label} email accepted for ${rfq.id}:`, JSON.stringify({
+        from: r.value?.envelope?.from,
+        to: r.value?.envelope?.to,
+        response: r.value?.response,
+        messageId: r.value?.messageId,
+      }));
     }
   });
 }
