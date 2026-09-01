@@ -77,9 +77,6 @@ function getClientIp(req) {
 
 async function sendEmails(rfq) {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, SMTP_FROM } = process.env;
-  console.error("RFQ_EMAIL_DEBUG entering sendEmails for", rfq.id, JSON.stringify({
-    hasHost: !!SMTP_HOST, hasPort: !!SMTP_PORT, hasSecure: !!SMTP_SECURE, hasUser: !!SMTP_USER, hasPass: !!SMTP_PASS, hasFrom: !!SMTP_FROM,
-  }));
   if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
     console.error("SMTP environment variables are not fully configured — RFQ emails not sent for", rfq.id);
     return;
@@ -108,13 +105,6 @@ async function sendEmails(rfq) {
     const label = i === 0 ? "sales notification" : "customer confirmation";
     if (r.status === "rejected") {
       console.error(`RFQ ${label} email failed for ${rfq.id}:`, r.reason?.message || r.reason);
-    } else {
-      console.error(`RFQ ${label} email accepted for ${rfq.id}:`, JSON.stringify({
-        from: r.value?.envelope?.from,
-        to: r.value?.envelope?.to,
-        response: r.value?.response,
-        messageId: r.value?.messageId,
-      }));
     }
   });
 }
