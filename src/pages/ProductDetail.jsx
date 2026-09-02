@@ -63,9 +63,8 @@ export default function ProductDetail() {
       const productPath = `/manufacturers/${manufacturerSlug}/${productSlug}`;
       setSEO({
         title: product.seo_title || `${label} | Trademarco Global`,
-        description: product.seo_description || `Buy ${label} from Trademarco Global. Worldwide supplier of industrial automation products. Request a quotation today.`,
+        description: product.seo_description || `Request a quote for ${label} from Trademarco Global. Worldwide supplier of industrial automation products.`,
         image: product.image_url || undefined,
-        type: "product",
         path: productPath,
       });
 

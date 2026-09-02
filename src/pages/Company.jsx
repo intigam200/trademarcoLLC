@@ -9,7 +9,7 @@ import Button from "../components/Button";
 export default function Company() {
   useEffect(() => {
     setSEO({
-      title: "About Trademarco Global",
+      title: "About Us | Trademarco Global",
       description: "TRADEMARCO LLC is a U.S.-registered industrial sourcing and procurement company based in Wyoming, supplying industrial automation, valves, instrumentation and electrical equipment worldwide.",
       path: "/company",
     });
