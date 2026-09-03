@@ -84,10 +84,25 @@ export default function Navbar() {
 
   // Fetched once, lazily — small lists (brands/categories), reused by both
   // the mega-menus and the mobile menu, so there's no need to load them per
-  // nav item.
+  // nav item. One retry so a single transient network/Supabase blip doesn't
+  // leave the mega-menu permanently empty for the rest of the page visit.
   useEffect(() => {
-    listManufacturers({ status: "active" }).then(setManufacturers).catch(() => {});
-    listCategories({ status: "active" }).then(setCategories).catch(() => {});
+    let cancelled = false;
+    const loadWithRetry = (fetcher, setter) => {
+      fetcher()
+        .then((data) => { if (!cancelled) setter(data); })
+        .catch(() => {
+          setTimeout(() => {
+            if (cancelled) return;
+            fetcher().then((data) => { if (!cancelled) setter(data); }).catch((err) => {
+              console.error("Nav data fetch failed after retry:", err.message);
+            });
+          }, 1500);
+        });
+    };
+    loadWithRetry(() => listManufacturers({ status: "active" }), setManufacturers);
+    loadWithRetry(() => listCategories({ status: "active" }), setCategories);
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
