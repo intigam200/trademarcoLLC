@@ -112,7 +112,13 @@ export default function Products() {
   }, [searchQuery]);
 
   useEffect(() => {
-    if (active) {
+    // Only give this URL a category-specific identity (title/description/
+    // canonical) when the category actually came from the URL. `active`
+    // itself defaults to categories[0] purely so the explorer UI always has
+    // a tab selected — that display default must not leak into SEO, or the
+    // bare /products URL permanently declares itself a duplicate of
+    // whichever category happens to sort first.
+    if (active && activeSlug) {
       setSEO({
         title: active.seo_title || `${active.name} | Industrial Products | Trademarco Global`,
         description: active.seo_description || active.full_description || `Browse ${active.name} industrial products and equipment supplied by Trademarco Global. Request a quotation today.`,
@@ -135,7 +141,7 @@ export default function Products() {
       });
     }
     return () => setJSONLD(null);
-  }, [active, loading]);
+  }, [active, activeSlug, loading]);
 
   return (
     <>
