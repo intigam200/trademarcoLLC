@@ -8,6 +8,7 @@ import { Section, SectionLabel, SectionTitle, SectionDesc } from "../components/
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 import ContactForm from "../components/ContactForm";
+import BrandMarquee from "../components/BrandMarquee";
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
@@ -155,6 +156,9 @@ export default function Home() {
           }
         `}</style>
       </section>
+
+      {/* ── BRANDS ── */}
+      <BrandMarquee />
 
       {/* ── BENEFIT BAR ── */}
       <div style={{ background: COLORS.white, boxShadow: "0 2px 12px rgba(0,0,0,0.06)", position: "relative", zIndex: 2 }}>
