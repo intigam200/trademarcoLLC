@@ -70,12 +70,12 @@ export default function BrandMarquee() {
           content: "";
           position: absolute;
           top: 0; left: 0; right: 0;
-          height: 1px;
+          height: 3px;
           z-index: 2;
           background: linear-gradient(90deg,
-            rgba(255,255,255,0.10) 0%,
-            rgba(255,255,255,0.60) 50%,
-            rgba(255,255,255,0.10) 100%);
+            rgba(255,255,255,0.12) 0%,
+            rgba(255,255,255,0.75) 50%,
+            rgba(255,255,255,0.12) 100%);
         }
 
         .tm-brand-head { padding-bottom: 44px; }
