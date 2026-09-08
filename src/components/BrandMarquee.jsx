@@ -37,22 +37,21 @@ export default function BrandMarquee() {
     ));
 
   return (
-    <section style={{ background: "#14203A", position: "relative", zIndex: 2 }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 40px 0" }}>
+    <section className="tm-brand-section" style={{ background: "#14203A", position: "relative", overflow: "hidden", zIndex: 2 }}>
+      {/* Refinery photo, then a navy wash over it — same treatment as the hero,
+          so the strip reads as one continuous dark band rather than a photo
+          block dropped between two sections. */}
+      <div className="tm-brand-bg" aria-hidden="true" />
+      <div className="tm-brand-wash" aria-hidden="true" />
+
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 40px 0", position: "relative", zIndex: 1 }}>
         <div className="tm-brand-head">
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: COLORS.orange, marginBottom: 14 }}>
-              Manufacturers
-            </div>
-            <h2 style={{ fontSize: "clamp(26px, 3.4vw, 40px)", fontWeight: 800, color: COLORS.white, lineHeight: 1.15, margin: 0, letterSpacing: "-0.02em", textTransform: "uppercase" }}>
-              Leading Industrial Brands
-            </h2>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: COLORS.orange, marginBottom: 14 }}>
+            Manufacturers
           </div>
-          <p className="tm-brand-head-desc">
-            Equipment and spare parts sourced through manufacturers and authorized supply
-            channels across Europe, the Americas and Asia — including equivalents and
-            replacements matched to your specification.
-          </p>
+          <h2 style={{ fontSize: "clamp(26px, 3.4vw, 40px)", fontWeight: 800, color: COLORS.white, lineHeight: 1.15, margin: 0, letterSpacing: "-0.02em", textTransform: "uppercase" }}>
+            Leading Industrial Brands
+          </h2>
         </div>
       </div>
 
@@ -64,23 +63,43 @@ export default function BrandMarquee() {
       </div>
 
       <style>{`
-        .tm-brand-head {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 48px;
-          padding-bottom: 44px;
+        /* Hairline along the top edge, so the hero photo ends on a deliberate
+           rule instead of an abrupt cut. Brightest mid-width, easing off
+           towards the edges rather than stopping dead. */
+        .tm-brand-section::before {
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 1px;
+          z-index: 2;
+          background: linear-gradient(90deg,
+            rgba(255,255,255,0.10) 0%,
+            rgba(255,255,255,0.60) 50%,
+            rgba(255,255,255,0.10) 100%);
         }
-        .tm-brand-head-desc {
-          font-size: 14px;
-          line-height: 1.75;
-          color: rgba(255,255,255,0.55);
-          margin: 0;
-          max-width: 420px;
-          text-align: right;
+
+        .tm-brand-head { padding-bottom: 44px; }
+
+        /* 60 KB WebP (20 KB below 900px) rather than the 1.5 MB source PNG,
+           and a plain background layer so it never competes with the hero
+           image for load priority. */
+        .tm-brand-bg {
+          position: absolute; inset: 0;
+          background-image: url(/images/products/brandsanimation.webp);
+          background-size: cover;
+          background-position: center 58%;
+        }
+        .tm-brand-wash {
+          position: absolute; inset: 0;
+          background: linear-gradient(90deg, rgba(20,32,58,0.95) 0%, rgba(20,32,58,0.86) 42%, rgba(20,32,58,0.62) 100%);
         }
 
         .tm-brand-marquee {
+          position: relative;
+          z-index: 1;
+          /* Deepens toward the right, where the photo is brightest, so the
+             names hold the same contrast across the whole strip. */
+          background: linear-gradient(90deg, rgba(13,22,42,0.5) 0%, rgba(13,22,42,0.74) 100%);
           border-top: 1px solid rgba(255,255,255,0.1);
           border-bottom: 1px solid rgba(255,255,255,0.1);
           overflow: hidden;
@@ -114,15 +133,17 @@ export default function BrandMarquee() {
           letter-spacing: 0.2em;
           text-transform: uppercase;
           white-space: nowrap;
-          color: rgba(255,255,255,0.45);
+          color: rgba(255,255,255,0.55);
           text-decoration: none;
           transition: color 0.2s ease, background 0.2s ease;
         }
         .tm-brand-item:hover { color: ${COLORS.white}; background: rgba(255,255,255,0.04); }
 
-        @media (max-width: 860px) {
-          .tm-brand-head { flex-direction: column; align-items: flex-start; gap: 18px; }
-          .tm-brand-head-desc { text-align: left; max-width: 100%; }
+        @media (max-width: 900px) {
+          .tm-brand-bg { background-image: url(/images/products/brandsanimation-sm.webp); }
+          .tm-brand-wash {
+            background: linear-gradient(90deg, rgba(20,32,58,0.94) 0%, rgba(20,32,58,0.82) 100%);
+          }
         }
         @media (max-width: 768px) {
           .tm-brand-item { height: 64px; padding: 0 28px; font-size: 12px; letter-spacing: 0.16em; }
