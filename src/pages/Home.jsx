@@ -10,10 +10,18 @@ import Button from "../components/Button";
 import ContactForm from "../components/ContactForm";
 import BrandMarquee from "../components/BrandMarquee";
 
+// The hero cycles through the same sector photographs used on /industries,
+// so the files are already in cache for anyone who lands there next — and a
+// picture added to INDUSTRIES joins the rotation without touching this file.
+const HERO_SLIDES = INDUSTRIES.filter((i) => i.photo);
+const HERO_SLIDE_MS = 6000;
+
 export default function Home() {
   const [categories, setCategories] = useState([]);
   const [heroHovered, setHeroHovered] = useState(false);
   const [heroScrolled, setHeroScrolled] = useState(false);
+  const [heroSlide, setHeroSlide] = useState(0);
+  const [heroSlidesReady, setHeroSlidesReady] = useState(false);
 
   useEffect(() => {
     listCategories({ status: "active" }).then(setCategories).catch(() => {});
@@ -24,6 +32,23 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Hold the remaining frames back until the page has finished loading, so
+  // the first one is the only hero image competing for bandwidth while the
+  // page is still painting.
+  useEffect(() => {
+    if (document.readyState === "complete") { setHeroSlidesReady(true); return; }
+    const onLoad = () => setHeroSlidesReady(true);
+    window.addEventListener("load", onLoad);
+    return () => window.removeEventListener("load", onLoad);
+  }, []);
+
+  useEffect(() => {
+    if (!heroSlidesReady || HERO_SLIDES.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setHeroSlide((s) => (s + 1) % HERO_SLIDES.length), HERO_SLIDE_MS);
+    return () => clearInterval(id);
+  }, [heroSlidesReady]);
 
   useEffect(() => {
     setSEO({
@@ -47,24 +72,42 @@ export default function Home() {
           position: "relative", overflow: "hidden",
         }}
       >
-        {/* Photo — occupies the right ~60% of the hero. Its own left edge is feathered
-            via mask-image so it dissolves into the navy background instead of reading
-            as a cropped rectangle; the image itself stays sharp and true to color. */}
+        {/* Photos — occupy the right ~60% of the hero and crossfade between the
+            sectors we serve. The left edge is feathered via mask-image on the
+            wrapper so every frame dissolves into the navy background instead of
+            reading as a cropped rectangle. */}
         <div className="tm-hero-photo" style={{
           position: "absolute", top: 0, bottom: 0, right: 0, width: "80%",
-          backgroundImage: "url(/images/products/port1.webp)",
-          backgroundSize: "cover", backgroundPosition: "center",
-          filter: "brightness(1)",
+          // The sector photographs range from a golden sunset to a near-black
+          // pit; knocking brightness and saturation down lets any of them sit
+          // in the navy hero the way the single dark photo used to.
+          filter: "brightness(0.62) saturate(0.8)",
           maskImage: "linear-gradient(90deg, transparent 0%, transparent 4%, black 28%)",
           WebkitMaskImage: "linear-gradient(90deg, transparent 0%, transparent 4%, black 28%)",
-        }} />
+        }}>
+          {HERO_SLIDES.map((ind, i) => {
+            // Fetch one frame ahead of the rotation rather than all six at once.
+            const load = i === 0 || (heroSlidesReady && i <= heroSlide + 1);
+            return (
+              <div
+                key={ind.slug}
+                aria-hidden="true"
+                className={`tm-hero-slide${i === heroSlide ? " tm-hero-slide-active" : ""}`}
+                style={load ? {
+                  "--hero-img": `url(/images/industries/${ind.photo}.webp)`,
+                  "--hero-img-sm": `url(/images/industries/${ind.photo}-sm.webp)`,
+                } : undefined}
+              />
+            );
+          })}
+        </div>
 
         {/* Navy wash — tinted (not solid) over the text column so the photo still
             reads through faintly there, then fades lighter across the rest so the
             photo becomes the visual accent rather than being buried under navy */}
         <div className="tm-hero-wash" style={{
           position: "absolute", inset: 0,
-          background: `linear-gradient(90deg, rgba(27,42,74,0.8) 25%, rgba(27,42,74,0.5) 50%, rgba(18, 29, 50, 0.1) 75%)`,
+          background: `linear-gradient(90deg, rgba(27,42,74,0.92) 20%, rgba(27,42,74,0.62) 50%, rgba(18, 29, 50, 0.38) 100%)`,
         }} />
 
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "140px 40px 96px", position: "relative", zIndex: 1, width: "100%" }}>
@@ -115,6 +158,16 @@ export default function Home() {
             min-height: 80vh;
             min-height: 80svh;
           }
+          .tm-hero-slide {
+            position: absolute;
+            inset: 0;
+            background-image: var(--hero-img);
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.4s ease-in-out;
+          }
+          .tm-hero-slide-active { opacity: 1; }
           .tm-hero-scroll-indicator {
             position: absolute; bottom: 28px; left: 50%;
             width: 44px; height: 2px; border-radius: 2px;
@@ -136,13 +189,19 @@ export default function Home() {
           }
           @media (prefers-reduced-motion: reduce) {
             .tm-hero-scroll-indicator, .tm-hero-scroll-indicator-visible { animation: none; transition: none; }
+            /* The rotation is already suppressed in JS; drop the fade too so
+               nothing moves if that check is ever bypassed. */
+            .tm-hero-slide { transition: none; }
+          }
+          @media (max-width: 900px) {
+            .tm-hero-slide { background-image: var(--hero-img-sm); }
           }
           @media (max-width: 768px) {
             .tm-hero-photo {
               width: 100% !important;
               mask-image: linear-gradient(180deg, transparent 0%, black 45%) !important;
               -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 45%) !important;
-              filter: brightness(0.55) !important;
+              filter: brightness(0.7) saturate(0.8) !important;
             }
             .tm-hero-wash {
               background: linear-gradient(180deg, rgba(15,25,45,0.4) 0%, rgba(15,25,45,0.88) 55%, ${COLORS.navy} 100%) !important;
