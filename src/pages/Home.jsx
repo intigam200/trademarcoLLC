@@ -230,11 +230,9 @@ export default function Home() {
 
       {/* ── INDUSTRIES ── */}
       <section id="industries" style={{ position: "relative", overflow: "hidden", background: COLORS.lightGray, scrollMarginTop: 64 }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: "linear-gradient(rgba(244,245,247,0.88), rgba(244,245,247,0.88)), url('/images/industries-bg.png')",
-          backgroundSize: "cover", backgroundPosition: "center right",
-        }} />
+        {/* industries-bg.png was never added to public/, so this layer only
+            ever resolved to the SPA shell — dropped the dead URL and kept the
+            wash, which is what actually rendered. */}
         <div style={{ position: "absolute", inset: 0, background: "rgba(244,245,247,0.88)" }} />
 
         <div style={{ maxWidth: 1160, margin: "0 auto", padding: "88px 24px", position: "relative", zIndex: 1 }}>
@@ -275,8 +273,8 @@ export default function Home() {
           {/* Industry cards */}
           <div className="tm-ind-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginTop: 40 }}>
             {INDUSTRIES.map((ind, i) => (
-              <div key={i} className="tm-ind-card tm-hover-icon" style={{
-                display: "flex", alignItems: "center", gap: 16,
+              <Link key={i} to={`/industries#${ind.slug}`} className="tm-ind-card tm-hover-icon" style={{
+                display: "flex", alignItems: "center", gap: 16, textDecoration: "none",
                 background: COLORS.white, border: `1.5px solid ${COLORS.orange}`, borderRadius: 10,
                 padding: 20, transition: "box-shadow 0.15s",
               }}
@@ -291,7 +289,7 @@ export default function Home() {
                   <p style={{ fontSize: 14, lineHeight: 1.5, color: COLORS.medGray, margin: 0 }}>{ind.desc}</p>
                 </div>
                 <Icon type="arrow-right" size={20} color={COLORS.orange} />
-              </div>
+              </Link>
             ))}
           </div>
 

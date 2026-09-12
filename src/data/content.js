@@ -2,7 +2,7 @@ export const NAV_LINKS = [
   { label: "Home", href: "/#hero" },
   { label: "Products", href: "/products" },
   { label: "Manufacturers", href: "/manufacturers" },
-  { label: "Industries", href: "/#industries" },
+  { label: "Industries", href: "/industries" },
   { label: "About", href: "/#about" },
   { label: "Company", href: "/company" },
   { label: "Contact", href: "/#contact" },
@@ -20,13 +20,66 @@ export const OEM_FEATURES = [
   { icon: "clock", title: "Fast RFQ Response", desc: "Submit your requirements and our team responds promptly with sourcing options." },
 ];
 
+// `slug` doubles as the anchor on /industries, so the cards on the home page
+// can deep-link into the matching block. `photo` is null where we don't have
+// a picture yet — the page renders an icon panel in its place rather than a
+// gap. `supplies` are drawn from the product categories in Supabase, so the
+// page describes the actual catalogue rather than generic capability claims.
 export const INDUSTRIES = [
-  { name: "Oil & Gas", desc: "Upstream, midstream and downstream operations", icon: "oil-rig" },
-  { name: "Petrochemical", desc: "Refineries and chemical processing plants", icon: "factory" },
-  { name: "Mining", desc: "Mineral processing and extraction facilities", icon: "mining-cart" },
-  { name: "Marine", desc: "Shipbuilding, offshore and port infrastructure", icon: "ship" },
-  { name: "Energy", desc: "Power generation and renewable energy", icon: "electrical" },
-  { name: "Manufacturing", desc: "Heavy industry and production facilities", icon: "gear" },
+  {
+    name: "Oil & Gas",
+    slug: "oil-gas",
+    desc: "Upstream, midstream and downstream operations",
+    icon: "oil-rig",
+    photo: null,
+    intro: "Upstream, midstream and downstream operations run on equipment rated for high pressure, aggressive media and continuous duty. We source control and isolation valves, process instrumentation and spares against your datasheets and tag numbers.",
+    supplies: ["Control Valves", "Safety / Relief Valves", "Pressure Transmitters", "Flow Meters", "Filter Elements"],
+  },
+  {
+    name: "Petrochemical",
+    slug: "petrochemical",
+    desc: "Refineries and chemical processing plants",
+    icon: "factory",
+    photo: "petrochemical",
+    intro: "Refineries and chemical plants work to tight turnaround windows, where a single missing item holds up a whole shutdown. We source valves, filtration and instrumentation to specification — including equivalents where an original has been discontinued.",
+    supplies: ["Globe Valves", "Butterfly Valves", "Coalescing Filters", "Temperature Instruments", "Seals & Gaskets"],
+  },
+  {
+    name: "Mining",
+    slug: "mining",
+    desc: "Mineral processing and extraction facilities",
+    icon: "mining-cart",
+    photo: "mining",
+    intro: "Extraction and mineral processing sites need components that hold up to abrasion, dust and vibration — and need them quickly, because downtime is measured in lost tonnage. We handle both planned resupply and urgent breakdown requests.",
+    supplies: ["Gate Valves", "Y-Strainers", "Electric Motors", "Bearings", "Replacement Parts"],
+  },
+  {
+    name: "Marine",
+    slug: "marine",
+    desc: "Shipbuilding, offshore and port infrastructure",
+    icon: "ship",
+    photo: "marine",
+    intro: "Shipyards, offshore units and port facilities work to class requirements and fixed dry-dock schedules. We source piping, fittings, valves and electrical equipment for newbuild projects and repair work alike.",
+    supplies: ["Butt Weld Fittings", "Flanges", "Check Valves", "Switchgear", "Pump Components"],
+  },
+  {
+    name: "Energy",
+    slug: "energy",
+    desc: "Power generation and renewable energy",
+    icon: "electrical",
+    photo: null,
+    intro: "Power generation and renewable installations depend on control and protection equipment that performs predictably over long service intervals. We source instrumentation, switchgear and valve components for operation and scheduled maintenance.",
+    supplies: ["Control Panels", "Drives", "Pressure Gauges", "Level Instruments", "Valve Components"],
+  },
+  {
+    name: "Manufacturing",
+    slug: "manufacturing",
+    desc: "Heavy industry and production facilities",
+    icon: "gear",
+    photo: null,
+    intro: "Production facilities keep lines running on predictable spares supply. We source automation components, drives and mechanical parts against your part numbers — original or equivalent, whichever the lead time calls for.",
+    supplies: ["Automation Components", "Industrial Controls", "Motor Starters", "Fasteners", "OEM / Equivalent Parts"],
+  },
 ];
 
 export const INDUSTRIES_INFO = [

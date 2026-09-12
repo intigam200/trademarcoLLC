@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Company from "./pages/Company";
 import Products from "./pages/Products";
 import Manufacturers from "./pages/Manufacturers";
+import Industries from "./pages/Industries";
 import ManufacturerDetail from "./pages/ManufacturerDetail";
 import ProductDetail from "./pages/ProductDetail";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/company" element={<Company />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/industries" element={<Industries />} />
           <Route path="/manufacturers" element={<Manufacturers />} />
           <Route path="/manufacturers/:slug" element={<ManufacturerDetail />} />
           <Route path="/manufacturers/:manufacturerSlug/:productSlug" element={<ProductDetail />} />

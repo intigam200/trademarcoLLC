@@ -29,6 +29,7 @@ export default async function handler(req, res) {
       { loc: "/company", changefreq: "monthly", priority: "0.5" },
       { loc: "/products", changefreq: "daily", priority: "0.8" },
       { loc: "/manufacturers", changefreq: "weekly", priority: "0.8" },
+      { loc: "/industries", changefreq: "monthly", priority: "0.7" },
       { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
       { loc: "/terms-of-service", changefreq: "yearly", priority: "0.3" },
       { loc: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
