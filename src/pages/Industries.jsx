@@ -6,6 +6,7 @@ import { listCategories } from "../lib/supabase/categories";
 import { setSEO, setJSONLD, SITE_URL } from "../lib/seo";
 import { Section, SectionLabel, SectionTitle, SectionDesc } from "../components/Section";
 import BrandMarquee from "../components/BrandMarquee";
+import HeroSlideshow from "../components/HeroSlideshow";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 
@@ -62,12 +63,15 @@ export default function Industries() {
   return (
     <>
       {/* ── HERO ── */}
-      <section style={{
-        background: COLORS.navy,
-        backgroundImage: "radial-gradient(ellipse 700px 100% at 30% 0%, rgba(45,114,210,0.16), transparent 60%)",
-        position: "relative", overflow: "hidden",
-      }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "120px 24px 80px", position: "relative", zIndex: 1 }}>
+      <section style={{ background: COLORS.navy, position: "relative", overflow: "hidden" }}>
+        {/* Same rotating sector photography as the home hero, feathered into
+            the navy on its left edge so the copy stays on flat colour. */}
+        <div className="tm-ind-hero-photo">
+          <HeroSlideshow />
+        </div>
+        <div className="tm-ind-hero-wash" />
+
+        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "104px 24px 72px", position: "relative", zIndex: 1 }}>
           <div style={{ maxWidth: 720 }}>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: COLORS.orange, marginBottom: 20 }}>
               Industries
@@ -209,6 +213,28 @@ export default function Industries() {
       </Section>
 
       <style>{`
+        .tm-ind-hero-photo {
+          position: absolute; top: 0; bottom: 0; right: 0; width: 78%;
+          filter: brightness(0.62) saturate(0.8);
+          mask-image: linear-gradient(90deg, transparent 0%, transparent 4%, black 30%);
+          -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 4%, black 30%);
+        }
+        .tm-ind-hero-wash {
+          position: absolute; inset: 0;
+          background: linear-gradient(90deg, rgba(27,42,74,0.92) 20%, rgba(27,42,74,0.62) 50%, rgba(18,29,50,0.38) 100%);
+        }
+        @media (max-width: 768px) {
+          .tm-ind-hero-photo {
+            width: 100%;
+            filter: brightness(0.7) saturate(0.8);
+            mask-image: linear-gradient(180deg, transparent 0%, black 45%);
+            -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 45%);
+          }
+          .tm-ind-hero-wash {
+            background: linear-gradient(180deg, rgba(15,25,45,0.4) 0%, rgba(15,25,45,0.88) 55%, ${COLORS.navy} 100%);
+          }
+        }
+
         .tm-sector-jump { display: flex; flex-wrap: wrap; gap: 10px; }
         .tm-sector-chip {
           display: inline-flex; align-items: center; gap: 8px;

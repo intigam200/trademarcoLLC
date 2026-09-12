@@ -9,19 +9,12 @@ import Icon from "../components/Icon";
 import Button from "../components/Button";
 import ContactForm from "../components/ContactForm";
 import BrandMarquee from "../components/BrandMarquee";
-
-// The hero cycles through the same sector photographs used on /industries,
-// so the files are already in cache for anyone who lands there next — and a
-// picture added to INDUSTRIES joins the rotation without touching this file.
-const HERO_SLIDES = INDUSTRIES.filter((i) => i.photo);
-const HERO_SLIDE_MS = 6000;
+import HeroSlideshow from "../components/HeroSlideshow";
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
   const [heroHovered, setHeroHovered] = useState(false);
   const [heroScrolled, setHeroScrolled] = useState(false);
-  const [heroSlide, setHeroSlide] = useState(0);
-  const [heroSlidesReady, setHeroSlidesReady] = useState(false);
 
   useEffect(() => {
     listCategories({ status: "active" }).then(setCategories).catch(() => {});
@@ -32,23 +25,6 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Hold the remaining frames back until the page has finished loading, so
-  // the first one is the only hero image competing for bandwidth while the
-  // page is still painting.
-  useEffect(() => {
-    if (document.readyState === "complete") { setHeroSlidesReady(true); return; }
-    const onLoad = () => setHeroSlidesReady(true);
-    window.addEventListener("load", onLoad);
-    return () => window.removeEventListener("load", onLoad);
-  }, []);
-
-  useEffect(() => {
-    if (!heroSlidesReady || HERO_SLIDES.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setHeroSlide((s) => (s + 1) % HERO_SLIDES.length), HERO_SLIDE_MS);
-    return () => clearInterval(id);
-  }, [heroSlidesReady]);
 
   useEffect(() => {
     setSEO({
@@ -85,21 +61,7 @@ export default function Home() {
           maskImage: "linear-gradient(90deg, transparent 0%, transparent 4%, black 28%)",
           WebkitMaskImage: "linear-gradient(90deg, transparent 0%, transparent 4%, black 28%)",
         }}>
-          {HERO_SLIDES.map((ind, i) => {
-            // Fetch one frame ahead of the rotation rather than all six at once.
-            const load = i === 0 || (heroSlidesReady && i <= heroSlide + 1);
-            return (
-              <div
-                key={ind.slug}
-                aria-hidden="true"
-                className={`tm-hero-slide${i === heroSlide ? " tm-hero-slide-active" : ""}`}
-                style={load ? {
-                  "--hero-img": `url(/images/industries/${ind.photo}.webp)`,
-                  "--hero-img-sm": `url(/images/industries/${ind.photo}-sm.webp)`,
-                } : undefined}
-              />
-            );
-          })}
+          <HeroSlideshow />
         </div>
 
         {/* Navy wash — tinted (not solid) over the text column so the photo still
@@ -110,18 +72,18 @@ export default function Home() {
           background: `linear-gradient(90deg, rgba(27,42,74,0.92) 20%, rgba(27,42,74,0.62) 50%, rgba(18, 29, 50, 0.38) 100%)`,
         }} />
 
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "140px 40px 96px", position: "relative", zIndex: 1, width: "100%" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "104px 40px 64px", position: "relative", zIndex: 1, width: "100%" }}>
           <div style={{ maxWidth: 680 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: COLORS.orange, marginBottom: 24 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: COLORS.orange, marginBottom: 18 }}>
               International Industrial Supply
             </div>
-            <h1 style={{ fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 800, color: COLORS.white, lineHeight: 1.12, margin: "0 0 24px", letterSpacing: "-0.025em" }}>
+            <h1 style={{ fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 800, color: COLORS.white, lineHeight: 1.12, margin: "0 0 18px", letterSpacing: "-0.025em" }}>
               Industrial Equipment<br />& Parts — Worldwide
             </h1>
-            <p style={{ fontSize: "clamp(16px, 1.8vw, 19px)", color: "rgb(255, 255, 255)", lineHeight: 1.7, margin: "0 0 40px", maxWidth: 520 }}>
+            <p style={{ fontSize: "clamp(16px, 1.8vw, 19px)", color: "rgb(255, 255, 255)", lineHeight: 1.7, margin: "0 0 30px", maxWidth: 520 }}>
               We source industrial equipment and components from qualified manufacturers worldwide — with competitive pricing, quality control, and reliable supply support.
             </p>
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 56 }}>
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 36 }}>
               <Button as="a" href="#contact" variant="primary" style={{ padding: "16px 32px", fontSize: 18, fontWeight: 600 }}>
                 Request a Quote <Icon type="arrow-right" size={18} color={COLORS.white} />
               </Button>
@@ -155,19 +117,9 @@ export default function Home() {
 
         <style>{`
           .tm-hero-section {
-            min-height: 80vh;
-            min-height: 80svh;
+            min-height: 68vh;
+            min-height: 68svh;
           }
-          .tm-hero-slide {
-            position: absolute;
-            inset: 0;
-            background-image: var(--hero-img);
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            transition: opacity 1.4s ease-in-out;
-          }
-          .tm-hero-slide-active { opacity: 1; }
           .tm-hero-scroll-indicator {
             position: absolute; bottom: 28px; left: 50%;
             width: 44px; height: 2px; border-radius: 2px;
@@ -189,12 +141,6 @@ export default function Home() {
           }
           @media (prefers-reduced-motion: reduce) {
             .tm-hero-scroll-indicator, .tm-hero-scroll-indicator-visible { animation: none; transition: none; }
-            /* The rotation is already suppressed in JS; drop the fade too so
-               nothing moves if that check is ever bypassed. */
-            .tm-hero-slide { transition: none; }
-          }
-          @media (max-width: 900px) {
-            .tm-hero-slide { background-image: var(--hero-img-sm); }
           }
           @media (max-width: 768px) {
             .tm-hero-photo {
