@@ -3,6 +3,17 @@
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/llms.txt", "destination": "/api/llms" },
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-Web|Claude-SearchBot|anthropic-ai|PerplexityBot|Perplexity-User|Google-Extended|Amazonbot|Applebot|Bytespider|CCBot|cohere-ai|DuckAssistBot|meta-externalagent|MistralAI-User|YouBot).*"
+        }
+      ],
+      "destination": "/api/render?path=/"
+    },
+    {
       "source": "/:path*",
       "has": [
         {
