@@ -19,9 +19,10 @@ export default async function handler(req, res) {
   try {
     const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
 
-    const [{ data: manufacturers }, { data: products }] = await Promise.all([
+    const [{ data: manufacturers }, { data: products }, { data: categories }] = await Promise.all([
       supabase.from("manufacturers").select("slug, updated_at").eq("status", "active"),
       supabase.from("products").select("slug, updated_at, manufacturer:manufacturers(slug)").eq("status", "published"),
+      supabase.from("categories").select("slug, updated_at").eq("status", "active"),
     ]);
 
     const urls = [
@@ -33,6 +34,7 @@ export default async function handler(req, res) {
       { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
       { loc: "/terms-of-service", changefreq: "yearly", priority: "0.3" },
       { loc: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
+      ...(categories ?? []).map((c) => ({ loc: `/products?category=${c.slug}`, lastmod: c.updated_at, changefreq: "weekly", priority: "0.7" })),
       ...(manufacturers ?? []).map((m) => ({ loc: `/manufacturers/${m.slug}`, lastmod: m.updated_at, changefreq: "weekly", priority: "0.7" })),
       ...(products ?? [])
         .filter((p) => p.manufacturer?.slug)

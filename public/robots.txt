@@ -2,4 +2,80 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
+# AI crawlers and assistants — explicitly allowed to read the catalogue.
+# Crawlers that don't execute JavaScript are served a server-rendered
+# version of the same pages automatically (see /llms.txt).
+
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin
+
+User-agent: Applebot
+Allow: /
+Disallow: /admin
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /admin
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /admin
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /admin
+
+User-agent: MistralAI-User
+Allow: /
+Disallow: /admin
+
 Sitemap: https://www.trademarco.com/sitemap.xml

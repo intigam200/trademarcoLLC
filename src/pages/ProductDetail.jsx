@@ -68,35 +68,42 @@ export default function ProductDetail() {
         path: productPath,
       });
 
-      // ItemPage + IndividualProduct instead of Product — this is a B2B
-      // request-a-quote catalog with no published prices, and a bare Product
-      // schema without offers/review/aggregateRating trips Search Console's
-      // structured-data validator. ItemPage has no such requirement.
-      setJSONLD({
-        "@context": "https://schema.org",
-        "@type": "ItemPage",
-        name: product.product_name,
-        description: product.short_description || product.long_description || undefined,
-        url: `${SITE_URL}${productPath}`,
-        breadcrumb: {
+      // Product + Offer, matching what api/render.js serves crawlers that
+      // don't run JS, so both audiences read the same graph. No price is
+      // published anywhere in the catalogue — this is a request-for-quote
+      // business — so the Offer names the seller and states that the item is
+      // offered for sale, and omits price rather than inventing one.
+      setJSONLD([
+        {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.product_name,
+          url: `${SITE_URL}${productPath}`,
+          description: product.short_description || product.long_description || undefined,
+          sku: product.part_number || undefined,
+          mpn: product.part_number || undefined,
+          image: product.image_url || undefined,
+          category: product.category?.name || undefined,
+          brand: mfrName ? { "@type": "Brand", name: mfrName } : undefined,
+          manufacturer: mfrName ? { "@type": "Organization", name: mfrName } : undefined,
+          offers: {
+            "@type": "Offer",
+            url: `${SITE_URL}${productPath}`,
+            businessFunction: "http://purl.org/goodrelations/v1#Sell",
+            seller: { "@type": "Organization", name: "TRADEMARCO LLC", url: SITE_URL },
+          },
+        },
+        {
+          "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-            { "@type": "ListItem", position: 2, name: mfrName, item: `${SITE_URL}/manufacturers/${manufacturerSlug}` },
-            { "@type": "ListItem", position: 3, name: product.product_name },
+            { "@type": "ListItem", position: 2, name: "Manufacturers", item: `${SITE_URL}/manufacturers` },
+            { "@type": "ListItem", position: 3, name: mfrName, item: `${SITE_URL}/manufacturers/${manufacturerSlug}` },
+            { "@type": "ListItem", position: 4, name: product.product_name },
           ],
         },
-        mainEntity: {
-          "@type": "IndividualProduct",
-          name: product.product_name,
-          sku: product.part_number || undefined,
-          description: product.short_description || product.long_description || undefined,
-          image: product.image_url || undefined,
-          brand: mfrName ? { "@type": "Brand", name: mfrName } : undefined,
-          manufacturer: mfrName ? { "@type": "Organization", name: mfrName } : undefined,
-          category: product.category?.name || undefined,
-        },
-      });
+      ]);
     } else if (status === "not-found") {
       setNoIndexSEO("Product Not Found | Trademarco Global");
       setJSONLD(null);
