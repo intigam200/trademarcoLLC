@@ -10,6 +10,7 @@ import Button from "../components/Button";
 import ContactForm from "../components/ContactForm";
 import BrandMarquee from "../components/BrandMarquee";
 import HeroSlideshow from "../components/HeroSlideshow";
+import SectorVideo from "../components/SectorVideo";
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
@@ -249,9 +250,8 @@ export default function Home() {
                 Our sourcing capabilities cover the critical industries that keep global infrastructure running.
               </SectionDesc>
             </div>
-            <img src="/images/products/shipment.webp" alt="Global shipping" className="tm-ind-header-img" style={{
-              width: 570, maxWidth: "75%", height: 240, objectFit: "cover", borderRadius: 'none',
-              boxShadow: 'none', flexShrink: 0,
+            <SectorVideo className="tm-ind-header-img" style={{
+              width: 570, maxWidth: "75%", height: 240, flexShrink: 0,
               maskImage: "radial-gradient(ellipse at center, black 55%, transparent 95%)",
               WebkitMaskImage: "radial-gradient(ellipse at center, black 55%, transparent 95%)",
             }} />

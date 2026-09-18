@@ -39,3 +39,7 @@ scripts/.index-urls-state.json
 # Private keys / certificates — never commit
 *.pem
 *.key
+
+# Source video masters (hundreds of MB) — only the encoded
+# public/videos/* versions belong in the repo
+/videos/
