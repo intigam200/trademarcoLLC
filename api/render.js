@@ -126,6 +126,19 @@ async function renderProduct(manufacturerSlug, productSlug) {
     industries.length ? `<h2>Industries</h2><ul>${industries.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : "",
     product.datasheet_url ? `<p><a href="${esc(product.datasheet_url)}">Manufacturer datasheet</a></p>` : "",
     product.rfq_available ? `<p>Available on request — pricing is quoted per enquiry. <a href="/#contact">Request a quotation</a>.</p>` : "",
+    // Same links the product page shows once JS runs: curated related products,
+    // then previous/next within the brand by part number. The prev/next chain
+    // is what ties each product to its neighbours instead of only to listings.
+    product.related.length
+      ? `<h2>Related products</h2><ul>${product.related.map((r) =>
+          `<li><a href="/manufacturers/${esc(r.manufacturer.slug)}/${esc(r.slug)}">${esc(r.product_name)}</a>${r.part_number ? ` (${esc(r.part_number)})` : ""}</li>`).join("")}</ul>`
+      : "",
+    product.prev || product.next
+      ? `<nav aria-label="More ${esc(manufacturerName)} products"><ul>${[
+          product.prev ? `<li>Previous: <a href="/manufacturers/${esc(manufacturerSlug)}/${esc(product.prev.slug)}">${esc(product.prev.product_name)}</a></li>` : "",
+          product.next ? `<li>Next: <a href="/manufacturers/${esc(manufacturerSlug)}/${esc(product.next.slug)}">${esc(product.next.product_name)}</a></li>` : "",
+        ].join("")}</ul></nav>`
+      : "",
     `<p><a href="/manufacturers/${esc(manufacturerSlug)}">All ${esc(manufacturerName)} products</a></p>`,
   ].filter(Boolean).join("\n");
 
@@ -342,6 +355,7 @@ export default async function handler(req, res) {
   const segments = pathname.split("/").filter(Boolean);
   const category = typeof req.query.category === "string" ? req.query.category : null;
 
+  const started = Date.now();
   try {
     let html = null;
 
@@ -366,7 +380,13 @@ export default async function handler(req, res) {
     }
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
+    // A day fresh, then served stale for up to a week while it refreshes in
+    // the background. Crawlers rarely hit the same URL twice in an hour, so the
+    // old one-hour lifetime meant almost every crawl paid for a full render —
+    // and slow responses make Google lower its crawl rate for the whole site.
+    // An admin edit still reaches crawlers within a day.
+    res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=604800");
+    res.setHeader("Server-Timing", `render;dur=${Date.now() - started}`);
     res.setHeader("X-Prerender", "bot");
     return res.status(200).send(html);
   } catch (err) {

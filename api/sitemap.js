@@ -2,11 +2,24 @@ import { createClient } from "@supabase/supabase-js";
 
 const SITE_URL = process.env.SITE_URL || "https://www.trademarco.com";
 
+// The day crawlers started receiving server-rendered pages (middleware.js).
+// Before it, every catalogue URL served Google the same empty shell, so a page
+// last edited in the database earlier than this still genuinely changed on
+// this date as far as a crawler is concerned. Raise this again only when the
+// HTML crawlers receive changes site-wide — Google stops trusting lastmod that
+// moves without the page changing.
+const RENDER_CHANGED = "2026-10-07";
+
+function lastmodFor(value) {
+  const date = new Date(value).toISOString().slice(0, 10);
+  return date > RENDER_CHANGED ? date : RENDER_CHANGED;
+}
+
 function urlEntry({ loc, lastmod, changefreq, priority }) {
   return [
     "  <url>",
     `    <loc>${SITE_URL}${loc}</loc>`,
-    lastmod ? `    <lastmod>${new Date(lastmod).toISOString().slice(0, 10)}</lastmod>` : null,
+    lastmod ? `    <lastmod>${lastmodFor(lastmod)}</lastmod>` : null,
     changefreq ? `    <changefreq>${changefreq}</changefreq>` : null,
     `    <priority>${priority}</priority>`,
     "  </url>",
@@ -26,11 +39,11 @@ export default async function handler(req, res) {
     ]);
 
     const urls = [
-      { loc: "/", changefreq: "daily", priority: "1.0" },
+      { loc: "/", lastmod: RENDER_CHANGED, changefreq: "daily", priority: "1.0" },
       { loc: "/company", changefreq: "monthly", priority: "0.5" },
-      { loc: "/products", changefreq: "daily", priority: "0.8" },
-      { loc: "/manufacturers", changefreq: "weekly", priority: "0.8" },
-      { loc: "/industries", changefreq: "monthly", priority: "0.7" },
+      { loc: "/products", lastmod: RENDER_CHANGED, changefreq: "daily", priority: "0.8" },
+      { loc: "/manufacturers", lastmod: RENDER_CHANGED, changefreq: "weekly", priority: "0.8" },
+      { loc: "/industries", lastmod: RENDER_CHANGED, changefreq: "monthly", priority: "0.7" },
       { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
       { loc: "/terms-of-service", changefreq: "yearly", priority: "0.3" },
       { loc: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
