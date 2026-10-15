@@ -252,8 +252,8 @@ export default function Home() {
             </div>
             <SectorVideo className="tm-ind-header-img" style={{
               width: 570, maxWidth: "75%", height: 240, flexShrink: 0,
-              maskImage: "radial-gradient(ellipse at center, black 55%, transparent 95%)",
-              WebkitMaskImage: "radial-gradient(ellipse at center, black 55%, transparent 95%)",
+              borderRadius: 14,
+              boxShadow: "0 18px 44px rgba(27,42,74,0.18), 0 2px 6px rgba(27,42,74,0.08)",
             }} />
           </div>
           <style>{`@media (max-width: 800px) { .tm-ind-header-img { display: none; } }`}</style>

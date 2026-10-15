@@ -1,0 +1,10 @@
+# Source video masters — hundreds of MB of 4K stock that only ever get
+# encoded down into public/videos/. The CLI uploads the working directory
+# rather than the git tree, so .gitignore alone doesn't keep them out.
+/videos/
+
+# Never ship credentials or local run state
+service-account*.json
+scripts/.index-urls-state.json
+*.pem
+*.key
