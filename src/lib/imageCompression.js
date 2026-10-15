@@ -5,7 +5,9 @@
 const MAX_DIMENSION = 1600;
 const QUALITY = 0.82;
 
-export function compressImageFile(file) {
+// Both can be overridden per call: a logo never needs 1600px, but its hard
+// edges and flat colour show compression artefacts sooner than a photo does.
+export function compressImageFile(file, { maxDimension = MAX_DIMENSION, quality = QUALITY } = {}) {
   return new Promise((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file);
     const img = new Image();
@@ -14,8 +16,8 @@ export function compressImageFile(file) {
       URL.revokeObjectURL(objectUrl);
 
       let { width, height } = img;
-      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-        const scale = MAX_DIMENSION / Math.max(width, height);
+      if (width > maxDimension || height > maxDimension) {
+        const scale = maxDimension / Math.max(width, height);
         width = Math.round(width * scale);
         height = Math.round(height * scale);
       }
@@ -32,7 +34,7 @@ export function compressImageFile(file) {
           resolve(new File([blob], name, { type: "image/webp" }));
         },
         "image/webp",
-        QUALITY
+        quality
       );
     };
     img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Could not read image file.")); };

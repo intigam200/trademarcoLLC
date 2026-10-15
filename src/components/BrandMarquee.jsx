@@ -97,6 +97,11 @@ export default function BrandMarquee() {
         .tm-brand-marquee {
           position: relative;
           z-index: 1;
+          /* Holds the row's height while the brands are still loading. Without
+             it the section painted 78px short, then grew when Supabase answered
+             — and background-size: cover rescaled the photo mid-load, which
+             read as the background jumping. */
+          min-height: 78px;
           /* Deepens toward the right, where the photo is brightest, so the
              names hold the same contrast across the whole strip. */
           background: linear-gradient(90deg, rgba(13,22,42,0.5) 0%, rgba(13,22,42,0.74) 100%);
@@ -146,6 +151,7 @@ export default function BrandMarquee() {
           }
         }
         @media (max-width: 768px) {
+          .tm-brand-marquee { min-height: 64px; }
           .tm-brand-item { height: 64px; padding: 0 28px; font-size: 12px; letter-spacing: 0.16em; }
         }
 
