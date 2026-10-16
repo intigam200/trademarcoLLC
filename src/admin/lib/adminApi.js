@@ -27,3 +27,24 @@ export function searchProductImages(query) {
 export function fetchAndStoreImage(url) {
   return authedPost("/api/admin/image-fetch", { url }).then((r) => r.url);
 }
+
+// ── SEO Growth Center ─────────────────────────────────────────────────────
+export function seoAuditPlan() {
+  return authedPost("/api/admin/seo-audit", { action: "plan" });
+}
+
+export function seoAuditCheck(urls) {
+  return authedPost("/api/admin/seo-audit", { action: "check", urls }).then((r) => r.results);
+}
+
+export function seoAuditStatus(urls) {
+  return authedPost("/api/admin/seo-audit", { action: "status", urls }).then((r) => r.results);
+}
+
+export function gscStatus() {
+  return authedPost("/api/admin/gsc", { action: "status" });
+}
+
+export function gscQuery({ startDate, endDate, dimension }) {
+  return authedPost("/api/admin/gsc", { action: "query", startDate, endDate, dimension }).then((r) => r.rows);
+}

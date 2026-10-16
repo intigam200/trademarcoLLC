@@ -32,10 +32,13 @@ export default async function handler(req, res) {
   try {
     const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
 
-    const [{ data: manufacturers }, { data: products }, { data: categories }] = await Promise.all([
+    const [{ data: manufacturers }, { data: products }, { data: categories }, { data: articles }] = await Promise.all([
       supabase.from("manufacturers").select("slug, updated_at").eq("status", "active"),
       supabase.from("products").select("slug, updated_at, manufacturer:manufacturers(slug)").eq("status", "published"),
       supabase.from("categories").select("slug, updated_at").eq("status", "active"),
+      // Any error — e.g. the articles table not created yet — leaves data
+      // null: no article URLs, nothing else affected.
+      supabase.from("articles").select("slug, updated_at").eq("status", "published"),
     ]);
 
     const urls = [
@@ -52,6 +55,9 @@ export default async function handler(req, res) {
       ...(products ?? [])
         .filter((p) => p.manufacturer?.slug)
         .map((p) => ({ loc: `/manufacturers/${p.manufacturer.slug}/${p.slug}`, lastmod: p.updated_at, changefreq: "weekly", priority: "0.6" })),
+      // The listing is only indexable once it has something on it.
+      ...(articles?.length ? [{ loc: "/articles", lastmod: articles.map((a) => a.updated_at).sort().at(-1), changefreq: "weekly", priority: "0.6" }] : []),
+      ...(articles ?? []).map((a) => ({ loc: `/articles/${a.slug}`, lastmod: a.updated_at, changefreq: "monthly", priority: "0.6" })),
     ];
 
     const body = urls.map(urlEntry).join("\n");

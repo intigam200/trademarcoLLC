@@ -7,6 +7,13 @@ const PRODUCT_SELECT = `
   category:categories ( id, slug, name )
 `;
 
+// A published product only has a public page while its manufacturer is
+// active too: RLS hides inactive manufacturers from visitors, so the join comes
+// back null and a link would point at /manufacturers/undefined/… — a 404.
+export function hasPublicPage(product) {
+  return !!product?.manufacturer?.slug;
+}
+
 export async function listProducts({ search, status, manufacturerId, categoryId } = {}) {
   let query = supabase.from("products").select(PRODUCT_SELECT).order("updated_at", { ascending: false });
   if (status) query = query.eq("status", status);

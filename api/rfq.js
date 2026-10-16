@@ -34,6 +34,22 @@ const MAX_LEN = {
   product: 200, partNumber: 100, message: 5000, pageUrl: 500,
 };
 
+// First-touch source sent by the browser (src/lib/trafficSource.js). Only a
+// hostname, a path and utm tags are accepted, each length-capped, so a client
+// can't use these fields to store anything else.
+function landingSourceFields(source) {
+  if (!source || typeof source !== "object") return {};
+  const host = clean(source.referrer).toLowerCase();
+  const page = clean(source.page);
+  return {
+    landing_referrer: /^[a-z0-9.-]{1,253}$/.test(host) ? host : null,
+    landing_page: page.startsWith("/") ? page.slice(0, 300) : null,
+    utm_source: clean(source.utm_source).slice(0, 100) || null,
+    utm_medium: clean(source.utm_medium).slice(0, 100) || null,
+    utm_campaign: clean(source.utm_campaign).slice(0, 100) || null,
+  };
+}
+
 // Strips control characters (except \n, \r, \t) a client could smuggle into
 // a JSON string body — these have no legitimate use in any of these fields
 // and would otherwise land in the database and in outbound emails verbatim.
@@ -183,27 +199,33 @@ export default async function handler(req, res) {
     }
   }
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("rfqs")
-    .insert({
-      company: fields.company,
-      contact_name: fields.name,
-      email: fields.email,
-      phone: fields.phone || null,
-      country: fields.country || null,
-      product_id: fields.productId,
-      product_text: fields.productId ? null : fields.product,
-      manufacturer_name: manufacturerName,
-      product_name: productName,
-      part_number: partNumber,
-      page_url: fields.pageUrl || null,
-      message: fields.message,
-      status: "unread",
-      ip_address: ip,
-      user_agent: clean(req.headers["user-agent"] || "") || null,
-    })
-    .select("id, request_id, created_at")
-    .single();
+  const row = {
+    company: fields.company,
+    contact_name: fields.name,
+    email: fields.email,
+    phone: fields.phone || null,
+    country: fields.country || null,
+    product_id: fields.productId,
+    product_text: fields.productId ? null : fields.product,
+    manufacturer_name: manufacturerName,
+    product_name: productName,
+    part_number: partNumber,
+    page_url: fields.pageUrl || null,
+    message: fields.message,
+    status: "unread",
+    ip_address: ip,
+    user_agent: clean(req.headers["user-agent"] || "") || null,
+  };
+  const source = landingSourceFields(body.landingSource);
+
+  let { data: inserted, error: insertError } = await supabase
+    .from("rfqs").insert({ ...row, ...source }).select("id, request_id, created_at").single();
+  // Until supabase/migrations/20261016_seo_growth_center.sql adds the source
+  // columns, PostgREST rejects them (PGRST204) — never let that cost an RFQ.
+  if (insertError && insertError.code === "PGRST204" && Object.keys(source).length) {
+    ({ data: inserted, error: insertError } = await supabase
+      .from("rfqs").insert(row).select("id, request_id, created_at").single());
+  }
 
   if (insertError) {
     console.error("RFQ insert failed:", insertError.message);

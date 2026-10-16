@@ -114,6 +114,8 @@ export default function Footer() {
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 48, padding: "24px 0 32px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>© 2026 TRADEMARCO LLC. All rights reserved.</span>
           <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+            <Link to="/articles" style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Articles</Link>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>|</span>
             <Link to="/privacy-policy" style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Privacy Policy</Link>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>|</span>
             <Link to="/terms-of-service" style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Terms of Service</Link>

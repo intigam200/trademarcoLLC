@@ -4,6 +4,7 @@ import { COLORS } from "../theme/colors";
 import { getManufacturerBySlug } from "../lib/supabase/manufacturers";
 import { listProducts } from "../lib/supabase/products";
 import { setSEO, setNoIndexSEO, setJSONLD, SITE_URL } from "../lib/seo";
+import { manufacturerMeta } from "../lib/seoMeta";
 import { Section } from "../components/Section";
 import LoadingState from "../components/LoadingState";
 import Icon from "../components/Icon";
@@ -40,8 +41,8 @@ export default function ManufacturerDetail() {
   useEffect(() => {
     if (manufacturer) {
       setSEO({
-        title: manufacturer.seo_title || `${manufacturer.name} Industrial Products | Trademarco Global`,
-        description: manufacturer.seo_description || manufacturer.description || `Explore ${manufacturer.name} industrial products supplied worldwide by Trademarco Global.`,
+        title: manufacturerMeta(manufacturer).title,
+        description: manufacturerMeta(manufacturer).description,
         image: manufacturer.logo_url || undefined,
         path: `/manufacturers/${manufacturer.slug}`,
       });

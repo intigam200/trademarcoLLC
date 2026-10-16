@@ -1,4 +1,8 @@
-import { getProduct, getManufacturer, listManufacturers, listCategories, listProducts } from "./_lib/catalogData.js";
+import { getProduct, getManufacturer, listManufacturers, listCategories, listProducts, listArticles, getArticle } from "./_lib/catalogData.js";
+import { renderMarkdown } from "../src/lib/markdown.js";
+// Shared with the React pages and the SEO Growth Center, so crawlers, visitors
+// and the admin audit all see the same titles and descriptions.
+import { ORG_NAME, productMeta, manufacturerMeta, categoryMeta, articleMeta } from "../src/lib/seoMeta.js";
 
 // Server-rendered HTML for crawlers that don't run JavaScript.
 //
@@ -14,7 +18,6 @@ import { getProduct, getManufacturer, listManufacturers, listCategories, listPro
 // workaround rather than serving crawlers different content than visitors.
 
 const SITE_URL = process.env.SITE_URL || "https://www.trademarco.com";
-const ORG_NAME = "Trademarco Global";
 const ORG_LEGAL_NAME = "TRADEMARCO LLC";
 
 function esc(value) {
@@ -107,10 +110,7 @@ async function renderProduct(manufacturerSlug, productSlug) {
 
   const path = `/manufacturers/${manufacturerSlug}/${productSlug}`;
   const manufacturerName = product.manufacturer?.name ?? "";
-  const label = [manufacturerName, product.part_number, product.product_name].filter(Boolean).join(" ");
-  const title = product.seo_title || `${label} | ${ORG_NAME}`;
-  const description = product.seo_description || product.short_description
-    || `Request a quote for ${label} from ${ORG_NAME}.`;
+  const { title, description } = productMeta(product, manufacturerName);
 
   const applications = Array.isArray(product.applications) ? product.applications : [];
   const industries = Array.isArray(product.industries) ? product.industries : [];
@@ -184,9 +184,7 @@ async function renderManufacturer(slug) {
   if (!manufacturer) return null;
 
   const path = `/manufacturers/${slug}`;
-  const title = manufacturer.seo_title || `${manufacturer.name} Industrial Products | ${ORG_NAME}`;
-  const description = manufacturer.seo_description || manufacturer.description
-    || `${manufacturer.name} industrial products supplied worldwide by ${ORG_NAME}.`;
+  const { title, description } = manufacturerMeta(manufacturer);
 
   const blocks = [
     `<h1>${esc(manufacturer.name)}</h1>`,
@@ -260,10 +258,12 @@ async function renderProducts(categorySlug) {
   if (categorySlug && !active) return null;
 
   const path = active ? `/products?category=${active.slug}` : "/products";
-  const title = active ? `${active.name} | Industrial Products | ${ORG_NAME}` : `Industrial Equipment & Components | ${ORG_NAME}`;
-  const description = active
-    ? (active.full_description || active.description || `Browse ${active.name} supplied by ${ORG_NAME}.`)
-    : `Browse industrial equipment and components sourced from qualified manufacturers worldwide by ${ORG_NAME}.`;
+  const { title, description } = active
+    ? categoryMeta(active)
+    : {
+      title: `Industrial Equipment & Components | ${ORG_NAME}`,
+      description: `Browse industrial equipment and components sourced from qualified manufacturers worldwide by ${ORG_NAME}.`,
+    };
 
   const blocks = [
     `<h1>${esc(active ? active.name : "Industrial Equipment & Components")}</h1>`,
@@ -347,6 +347,59 @@ async function renderIndustries() {
   });
 }
 
+async function renderArticles() {
+  const articles = await listArticles();
+  // Mirrors the SPA: an empty listing is not served as an indexable page.
+  if (!articles.length) return null;
+  const blocks = [
+    "<h1>Articles &amp; Guides</h1>",
+    `<ul>${articles.map((a) => `<li><a href="/articles/${esc(a.slug)}">${esc(a.title)}</a>${a.excerpt ? ` — ${esc(a.excerpt)}` : ""}</li>`).join("\n")}</ul>`,
+  ].join("\n");
+  return page({
+    path: "/articles",
+    title: `Industrial Sourcing Articles & Guides | ${ORG_NAME}`,
+    description: "Practical guides on selecting, replacing and sourcing industrial valves, instrumentation, automation and electrical equipment.",
+    blocks,
+    schemas: [breadcrumb([{ name: "Home", path: "/" }, { name: "Articles", path: "/articles" }])],
+  });
+}
+
+async function renderArticle(slug) {
+  const article = await getArticle(slug);
+  if (!article) return null;
+  const path = `/articles/${article.slug}`;
+  const { title, description } = articleMeta(article);
+  const blocks = [
+    `<article><h1>${esc(article.title)}</h1>`,
+    article.published_at ? `<p><time datetime="${esc(article.published_at)}">${esc(new Date(article.published_at).toISOString().slice(0, 10))}</time></p>` : "",
+    article.hero_image_url ? `<img src="${esc(article.hero_image_url)}" alt="${esc(article.hero_image_alt || "")}">` : "",
+    // renderMarkdown escapes all input and emits only allow-listed tags.
+    renderMarkdown(article.body_md),
+    `<p><a href="/#contact">Request a quotation</a></p></article>`,
+  ].filter(Boolean).join("\n");
+  return page({
+    path,
+    title,
+    description,
+    blocks,
+    schemas: [
+      {
+        "@type": "BlogPosting",
+        headline: article.title,
+        description: description || undefined,
+        url: `${SITE_URL}${path}`,
+        mainEntityOfPage: `${SITE_URL}${path}`,
+        image: article.hero_image_url || undefined,
+        datePublished: article.published_at || undefined,
+        dateModified: article.updated_at || article.published_at || undefined,
+        author: { "@id": `${SITE_URL}/#organization` },
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      },
+      breadcrumb([{ name: "Home", path: "/" }, { name: "Articles", path: "/articles" }, { name: article.title }]),
+    ],
+  });
+}
+
 export default async function handler(req, res) {
   // vercel.json passes the original path through; fall back to the raw URL so
   // the function is still usable when hit directly.
@@ -369,6 +422,9 @@ export default async function handler(req, res) {
       if (segments.length === 1) html = await renderManufacturerIndex();
       else if (segments.length === 2) html = await renderManufacturer(segments[1]);
       else if (segments.length === 3) html = await renderProduct(segments[1], segments[2]);
+    } else if (segments[0] === "articles") {
+      if (segments.length === 1) html = await renderArticles();
+      else if (segments.length === 2) html = await renderArticle(segments[1]);
     }
 
     if (!html) {

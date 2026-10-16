@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
 import { listCategories } from "../lib/supabase/categories";
-import { listProducts } from "../lib/supabase/products";
+import { hasPublicPage, listProducts } from "../lib/supabase/products";
 import { setSEO, setJSONLD, SITE_URL } from "../lib/seo";
+import { categoryMeta } from "../lib/seoMeta";
 import { Section, SectionTitle } from "../components/Section";
 import LoadingState from "../components/LoadingState";
 import EmptyState from "../components/EmptyState";
@@ -79,7 +80,7 @@ export default function Products() {
     let cancelled = false;
     setProductsLoading(true);
     listProducts({ categoryId: active.id, status: "published" })
-      .then((data) => { if (!cancelled) { setCategoryProducts(data); setVisibleCount(PAGE_SIZE); } })
+      .then((data) => { if (!cancelled) { setCategoryProducts(data.filter(hasPublicPage)); setVisibleCount(PAGE_SIZE); } })
       .catch(() => { if (!cancelled) setCategoryProducts([]); })
       .finally(() => { if (!cancelled) setProductsLoading(false); });
     return () => { cancelled = true; };
@@ -105,7 +106,7 @@ export default function Products() {
     let cancelled = false;
     setSearchLoading(true);
     listProducts({ search: searchQuery, status: "published" })
-      .then((data) => { if (!cancelled) { setSearchResults(data); setVisibleCount(PAGE_SIZE); } })
+      .then((data) => { if (!cancelled) { setSearchResults(data.filter(hasPublicPage)); setVisibleCount(PAGE_SIZE); } })
       .catch(() => { if (!cancelled) setSearchResults([]); })
       .finally(() => { if (!cancelled) setSearchLoading(false); });
     return () => { cancelled = true; };
@@ -120,8 +121,8 @@ export default function Products() {
     // whichever category happens to sort first.
     if (active && activeSlug) {
       setSEO({
-        title: active.seo_title || `${active.name} | Industrial Products | Trademarco Global`,
-        description: active.seo_description || active.full_description || `Browse ${active.name} industrial products and equipment supplied by Trademarco Global. Request a quotation today.`,
+        title: categoryMeta(active).title,
+        description: categoryMeta(active).description,
         path: `/products?category=${active.slug}`,
       });
       setJSONLD({

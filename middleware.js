@@ -29,6 +29,8 @@ const RENDERABLE = [
   /^\/manufacturers\/?$/,
   /^\/manufacturers\/[^/]+\/?$/,
   /^\/manufacturers\/[^/]+\/[^/]+\/?$/,
+  /^\/articles\/?$/,
+  /^\/articles\/[^/]+\/?$/,
 ];
 
 export const config = {

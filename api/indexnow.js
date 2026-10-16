@@ -37,15 +37,19 @@ export default async function handler(req, res) {
   try {
     const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
     const since = new Date(Date.now() - WINDOW_MS).toISOString();
-    const [{ data: products }, { data: manufacturers }] = await Promise.all([
+    const [{ data: products }, { data: manufacturers }, { data: articles }] = await Promise.all([
       supabase.from("products").select("slug, manufacturer:manufacturers!inner ( slug )").eq("status", "published").gte("updated_at", since),
       supabase.from("manufacturers").select("slug").eq("status", "active").gte("updated_at", since),
+      // Null data (not an error) while the articles migration isn't applied.
+      supabase.from("articles").select("slug").eq("status", "published").gte("updated_at", since),
     ]);
 
     const urls = [
       ...(manufacturers ?? []).map((m) => `${SITE_URL}/manufacturers/${m.slug}`),
       ...(products ?? []).map((p) => `${SITE_URL}/manufacturers/${p.manufacturer.slug}/${p.slug}`),
+      ...(articles ?? []).map((a) => `${SITE_URL}/articles/${a.slug}`),
     ];
+    if (articles?.length) urls.push(`${SITE_URL}/articles`);
     // Listing pages change whenever anything in them does.
     if (urls.length) urls.push(`${SITE_URL}/`, `${SITE_URL}/products`, `${SITE_URL}/manufacturers`);
 

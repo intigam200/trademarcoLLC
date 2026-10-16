@@ -86,19 +86,49 @@ export async function listManufacturers() {
 
 export async function listCategories() {
   const { data } = await db()
-    .from("categories").select("slug, name, description, full_description, types")
+    .from("categories").select("slug, name, description, full_description, types, seo_title, seo_description")
     .eq("status", "active").order("name");
   return data ?? [];
+}
+
+// A published product under a manufacturer that isn't active has no public
+// page (RLS hides the manufacturer, so the join is null). Listing it would
+// link to /manufacturers/undefined/… — leave it out, as the site does.
+function withPublicPage(rows) {
+  return (rows ?? []).filter((p) => p.manufacturer?.slug);
 }
 
 export async function listProducts({ categorySlug } = {}) {
   if (!categorySlug) {
     const { data } = await db().from("products").select(PRODUCT_FIELDS).eq("status", "published").order("part_number");
-    return data ?? [];
+    return withPublicPage(data);
   }
   const fields = PRODUCT_FIELDS.replace("category:categories ( slug, name )", "category:categories!inner ( slug, name )");
   const { data } = await db().from("products").select(fields)
     .eq("category.slug", categorySlug).eq("status", "published")
     .order("part_number");
+  return withPublicPage(data);
+}
+
+// Articles come from the SEO Growth Center migration. Until it has been
+// applied the table doesn't exist; treat that as "no articles" rather than
+// failing the render (PGRST205 / 42P01 = missing table).
+function articlesMissing(error) {
+  return error && (error.code === "PGRST205" || error.code === "42P01");
+}
+
+export async function listArticles() {
+  const { data, error } = await db()
+    .from("articles").select("slug, title, excerpt, meta_title, meta_description, published_at, updated_at")
+    .eq("status", "published").order("published_at", { ascending: false });
+  if (articlesMissing(error)) return [];
   return data ?? [];
+}
+
+export async function getArticle(slug) {
+  const { data, error } = await db()
+    .from("articles").select("slug, title, excerpt, meta_title, meta_description, body_md, hero_image_url, hero_image_alt, published_at, updated_at")
+    .eq("slug", slug).eq("status", "published").maybeSingle();
+  if (articlesMissing(error)) return null;
+  return data ?? null;
 }

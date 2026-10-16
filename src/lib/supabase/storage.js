@@ -28,6 +28,13 @@ export async function uploadManufacturerLogo(file) {
   return uploadFile("product-images", prepared, "logos");
 }
 
+// Article images: same bucket and policies, own folder, same compression as
+// product photos.
+export async function uploadArticleImage(file) {
+  const compressed = await compressImageFile(file).catch(() => file);
+  return uploadFile("product-images", compressed, "articles");
+}
+
 export function uploadDatasheet(file) {
   return uploadFile("datasheets", file);
 }

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { COLORS } from "../theme/colors";
 import { getPublishedProductBySlugs, getRelatedProducts, listProducts } from "../lib/supabase/products";
 import { setSEO, setNoIndexSEO, setJSONLD, SITE_URL } from "../lib/seo";
+import { productMeta } from "../lib/seoMeta";
 import { Section, SectionLabel, SectionTitle } from "../components/Section";
 import LoadingState from "../components/LoadingState";
 import Icon from "../components/Icon";
@@ -59,11 +60,13 @@ export default function ProductDetail() {
   useEffect(() => {
     if (status === "ready" && product) {
       const mfrName = product.manufacturer?.name ?? "";
-      const label = [mfrName, product.part_number, product.product_name].filter(Boolean).join(" ");
       const productPath = `/manufacturers/${manufacturerSlug}/${productSlug}`;
+      // Same derivation api/render.js serves crawlers and the SEO Growth
+      // Center audits — see src/lib/seoMeta.js.
+      const meta = productMeta(product, mfrName);
       setSEO({
-        title: product.seo_title || `${label} | Trademarco Global`,
-        description: product.seo_description || `Request a quote for ${label} from Trademarco Global. Worldwide supplier of industrial automation products.`,
+        title: meta.title,
+        description: meta.description,
         image: product.image_url || undefined,
         path: productPath,
       });
@@ -207,7 +210,7 @@ export default function ProductDetail() {
           <div>
             {product.image_url && (
               <div style={{ background: COLORS.lightGray, border: `1px solid ${COLORS.borderGray}`, borderRadius: 10, padding: 24, marginBottom: 32, display: "flex", alignItems: "center", justifyContent: "center", maxHeight: 360 }}>
-                <img src={product.image_url} alt={product.product_name} style={{ maxWidth: "100%", maxHeight: 312, objectFit: "contain" }} />
+                <img src={product.image_url} alt={productMeta(product).imageAlt} style={{ maxWidth: "100%", maxHeight: 312, objectFit: "contain" }} />
               </div>
             )}
             <SectionLabel>Product Details</SectionLabel>

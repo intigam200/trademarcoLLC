@@ -65,5 +65,10 @@
       "path": "/api/indexnow",
       "schedule": "0 6 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/admin/seo-audit.js": {
+      "maxDuration": 60
+    }
+  }
 }

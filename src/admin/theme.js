@@ -11,6 +11,9 @@ export const ADMIN_COLORS = {
   sidebarTextActive: "#FFFFFF",
   contentBg: COLORS.offWhite,
   cardBg: COLORS.white,
+  // AdminCard, Modal and others read ADMIN_COLORS.border, which was never
+  // defined — their borders rendered as "1px solid undefined" (no border).
+  border: COLORS.borderGray,
   accent: COLORS.orange,
   accentHover: COLORS.orangeHover,
   success: "#1E8E5A",
@@ -30,5 +33,6 @@ export const ADMIN_NAV_ITEMS = [
   { label: "Categories", to: "/admin/categories", icon: "clipboard" },
   { label: "Import Center", to: "/admin/import", icon: "upload" },
   { label: "RFQs", to: "/admin/rfqs", icon: "mail" },
+  { label: "SEO Growth Center", to: "/admin/seo", icon: "compass" },
   { label: "Settings", to: "/admin/settings", icon: "gear" },
 ];

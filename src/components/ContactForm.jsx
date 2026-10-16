@@ -4,6 +4,7 @@ import { COLORS } from "../theme/colors";
 import Icon from "./Icon";
 import Button from "./Button";
 import Turnstile from "./Turnstile";
+import { readLandingSource } from "../lib/trafficSource";
 
 const FIELD_LABELS = {
   name: "Full Name",
@@ -158,6 +159,7 @@ export default function ContactForm({ productId = null, manufacturerName = "", p
           productId: isMultiItem ? null : productId,
           manufacturerName: combinedManufacturerName,
           pageUrl: typeof window !== "undefined" ? window.location.href : "",
+          landingSource: readLandingSource(),
           turnstileToken,
         }),
       });

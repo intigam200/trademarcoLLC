@@ -4,7 +4,7 @@ import { COLORS } from "../theme/colors";
 import { NAV_LINKS } from "../data/content";
 import { listManufacturers } from "../lib/supabase/manufacturers";
 import { listCategories } from "../lib/supabase/categories";
-import { listProducts } from "../lib/supabase/products";
+import { hasPublicPage, listProducts } from "../lib/supabase/products";
 import { useQuoteList } from "../context/QuoteListContext";
 import Icon from "./Icon";
 import Button from "./Button";
@@ -129,7 +129,7 @@ export default function Navbar() {
     let cancelled = false;
     setSearchLoading(true);
     listProducts({ search: searchQuery, status: "published" })
-      .then((data) => { if (!cancelled) setSearchResults(data.slice(0, SEARCH_RESULT_LIMIT)); })
+      .then((data) => { if (!cancelled) setSearchResults(data.filter(hasPublicPage).slice(0, SEARCH_RESULT_LIMIT)); })
       .catch(() => { if (!cancelled) setSearchResults([]); })
       .finally(() => { if (!cancelled) setSearchLoading(false); });
     return () => { cancelled = true; };

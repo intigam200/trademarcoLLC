@@ -9,6 +9,8 @@ import Manufacturers from "./pages/Manufacturers";
 import Industries from "./pages/Industries";
 import ManufacturerDetail from "./pages/ManufacturerDetail";
 import ProductDetail from "./pages/ProductDetail";
+import Articles from "./pages/Articles";
+import ArticleDetail from "./pages/ArticleDetail";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -28,6 +30,8 @@ const AdminCategories = lazy(() => import("./admin/pages/Categories"));
 const AdminImport = lazy(() => import("./admin/pages/Import"));
 const AdminRFQs = lazy(() => import("./admin/pages/RFQs"));
 const AdminSettings = lazy(() => import("./admin/pages/Settings"));
+const AdminSeo = lazy(() => import("./admin/pages/seo/SeoGrowthCenter"));
+const AdminArticleEditor = lazy(() => import("./admin/pages/seo/ArticleEditor"));
 
 function PublicLayout() {
   return (
@@ -64,6 +68,8 @@ export default function App() {
           <Route path="/manufacturers" element={<Manufacturers />} />
           <Route path="/manufacturers/:slug" element={<ManufacturerDetail />} />
           <Route path="/manufacturers/:manufacturerSlug/:productSlug" element={<ProductDetail />} />
+          <Route path="/articles" element={<Articles />} />
+          <Route path="/articles/:slug" element={<ArticleDetail />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/cookie-policy" element={<CookiePolicy />} />
@@ -89,6 +95,9 @@ export default function App() {
             <Route path="import" element={<AdminImport />} />
             <Route path="rfqs" element={<AdminRFQs />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="seo/content/new" element={<AdminArticleEditor />} />
+            <Route path="seo/content/:id" element={<AdminArticleEditor />} />
+            <Route path="seo/:section?" element={<AdminSeo />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>
         </Route>
