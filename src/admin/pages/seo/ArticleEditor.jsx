@@ -382,8 +382,30 @@ export default function ArticleEditor() {
               <>
                 <button type="button" style={{ ...btn.secondary, ...(evaluation.canPublish ? { borderColor: ADMIN_COLORS.success, color: ADMIN_COLORS.success } : {}) }} onClick={publish} disabled={!!busy || !evaluation.canPublish}>Publish</button>
                 {!evaluation.canPublish && (
-                  <div style={{ fontSize: 11.5, color: ADMIN_COLORS.medGray, lineHeight: 1.45 }}>
-                    Publishing needs every check without a fail and every reviewer sign-off. Remaining: {evaluation.blockers.join("; ")}.
+                  <div style={{ fontSize: 12, lineHeight: 1.45, border: `1px solid ${ADMIN_COLORS.warning}`, background: ADMIN_COLORS.warningBg, borderRadius: 6, padding: 10 }}>
+                    <div style={{ fontWeight: 700, color: ADMIN_COLORS.navy, marginBottom: 6 }}>
+                      Before publishing — {evaluation.checks.filter((c) => c.state === "fail" || (c.kind === "human" && c.state !== "pass")).length} left:
+                    </div>
+                    <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 6 }}>
+                      {evaluation.checks.filter((c) => c.state === "fail").map((c) => (
+                        <li key={c.id}>
+                          <span style={{ color: ADMIN_COLORS.danger, fontWeight: 700 }}>Fix: </span>{c.label}
+                          {c.items?.length > 0 && <span style={{ color: ADMIN_COLORS.medGray }}> ({c.items.length} — see the checklist)</span>}
+                        </li>
+                      ))}
+                      {evaluation.checks.filter((c) => c.kind === "human" && c.state !== "pass").map((c) => (
+                        <li key={c.id} style={{ display: "grid", gap: 4 }}>
+                          <span>
+                            <span style={{ color: ADMIN_COLORS.warning, fontWeight: 700 }}>{c.stale ? "Re-confirm: " : "Confirm: "}</span>{c.label}
+                            {c.stale && <span style={{ color: ADMIN_COLORS.medGray }}> — the text changed after your last review</span>}
+                          </span>
+                          <button type="button" onClick={() => toggleSignOff(c.id, false)} style={{ ...btn.secondary, justifySelf: "start", padding: "4px 10px", fontSize: 12 }}>
+                            I&rsquo;ve reviewed the current text
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    <div style={{ color: ADMIN_COLORS.medGray, fontSize: 11, marginTop: 6 }}>Confirmations are saved with the article and apply to this exact text.</div>
                   </div>
                 )}
               </>
