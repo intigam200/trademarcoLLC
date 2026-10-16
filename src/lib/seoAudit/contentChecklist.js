@@ -65,6 +65,75 @@ export function extractPartNumberLike(text) {
   return [...found];
 }
 
+// ── Unresolved draft notes ─────────────────────────────────────────────────
+// Finds editorial instructions left in an article: the notes a brief-generated
+// draft starts with, and anything an editor typically leaves behind ("TODO",
+// "[insert spec]", "(TBD)", "Add here …"). Ordinary parentheses and brackets —
+// "(19 mm)", "(HART)", "[144,0]", Markdown links and images — are left alone:
+// a bracket or parenthesis is only a note when its content reads as one.
+
+const NOTE_WORDS = "insert|add(?:\\s+(?:here|link|image|source|details?|text|section|more))?|todo|to-do|tbd|tba|tbc|fixme|placeholder|fill(?:\\s+in)?|replace|write|verify|confirm|check this|citation needed|source needed|needs? (?:a )?source|to be (?:confirmed|added|determined|written|verified|completed)|opening paragraph|call to action|cite sources|editor'?s? note|note to (?:self|editor)|xx+";
+// [ ... ] that isn't a link/image label: a note if it contains a draft word.
+const BRACKET_NOTE = new RegExp(`(?<!!)\\[([^\\]\\n]*\\b(?:${NOTE_WORDS})\\b[^\\]\\n]*)\\](?!\\()`, "gi");
+// ( ... ) not directly after "]" (a link URL): a note only if it STARTS with a draft word.
+const PAREN_NOTE = new RegExp(`(?<!\\])\\(\\s*((?:${NOTE_WORDS})\\b[^()\\n]*)\\)`, "gi");
+// Lines that open with an instruction to the editor.
+// "Insert" alone is ordinary prose ("Insert the sensor through…"), so only the
+// editorial forms count.
+const LINE_NOTE = /^\s*(?:[-*>]\s*)?((?:insert(?:\s+here\b|\s*:)|add here\b|todo\b|tbd\b|fixme\b|note to editor\b|editor'?s note\b).*)$/gim;
+// Stand-alone markers, case-sensitive so ordinary words aren't caught.
+const TOKEN_NOTE = /\b(TODO|TBD|TBA|TBC|FIXME|XXX+)\b|(lorem ipsum)|(\?{3,})|(<insert[^>]*>)/gi;
+const TEMPLATE_BANNER = "Draft created from a template-based brief";
+
+function blankInlineCode(line) {
+  // Keep positions stable but hide `code`, which may legitimately show brackets.
+  return line.replace(/`[^`]*`/g, (m) => " ".repeat(m.length));
+}
+
+function notesIn(text, where) {
+  const found = [];
+  const lines = String(text ?? "").split("\n");
+  lines.forEach((raw, i) => {
+    const line = blankInlineCode(raw);
+    const seen = new Set();
+    const push = (start, snippet, reason) => {
+      if ([...seen].some(([s, e]) => start >= s && start < e)) return;
+      seen.add([start, start + snippet.length]);
+      found.push({ where, line: i + 1, text: snippet.trim(), reason });
+    };
+    if (line.includes(TEMPLATE_BANNER)) push(0, raw, "Template banner from the brief");
+    for (const m of line.matchAll(BRACKET_NOTE)) push(m.index, m[0], "Bracketed draft note");
+    for (const m of line.matchAll(PAREN_NOTE)) push(m.index, m[0], "Draft note in parentheses");
+    for (const m of line.matchAll(LINE_NOTE)) push(m.index, m[1], "Instruction to the editor");
+    for (const m of line.matchAll(TOKEN_NOTE)) {
+      // Upper-case markers only; "todo" inside a normal word or sentence is fine.
+      if (m[1] && m[1] !== m[1].toUpperCase()) continue;
+      push(m.index, m[0], "Placeholder marker");
+    }
+  });
+  return found;
+}
+
+// Fingerprint of everything a reviewer signs off on. Not cryptographic — it
+// only has to notice that the reviewed text changed.
+export function contentFingerprint(article) {
+  const text = [article?.title, article?.meta_title, article?.meta_description, article?.excerpt, article?.body_md]
+    .map((v) => v ?? "").join("\u0000");
+  let h = 5381;
+  for (let i = 0; i < text.length; i++) h = ((h * 33) ^ text.charCodeAt(i)) >>> 0;
+  return `${text.length.toString(36)}-${h.toString(36)}`;
+}
+
+export function findUnresolvedNotes(article) {
+  const fields = [["title", "Title"], ["meta_title", "Meta title"], ["meta_description", "Meta description"], ["excerpt", "Excerpt"], ["hero_image_alt", "Hero image alt text"]];
+  const out = [];
+  // Single-line fields: a line number would only ever say "1", so drop it.
+  for (const [key, label] of fields) out.push(...notesIn(article?.[key], label).map((n) => ({ where: n.where, text: n.text, reason: n.reason })));
+  out.push(...notesIn(article?.body_md, "Body"));
+  // A field-level note has no line number; body notes keep theirs.
+  return out.sort((a, b) => (a.where === "Body") - (b.where === "Body") || (a.line ?? 0) - (b.line ?? 0));
+}
+
 export function evaluateArticle(article, ctx = {}) {
   const { articles = [], products = [], manufacturers = [], categories = [] } = ctx;
   const body = article.body_md || "";
@@ -105,12 +174,16 @@ export function evaluateArticle(article, ctx = {}) {
     unknown.length ? "warning" : "pass",
     unknown.length ? `Not in the catalogue — verify against the source: ${unknown.slice(0, 12).join(", ")}${unknown.length > 12 ? "…" : ""}` : mentioned.length ? `${mentioned.length} model number${mentioned.length === 1 ? "" : "s"} found in the catalogue.` : "No model numbers mentioned.");
 
-  // Bracketed notes left over from a brief-generated draft.
-  const placeholders = [...body.matchAll(/\[(Opening paragraph|Write this section|Call to action)[^\]]*\]/g)].length
-    + (body.includes("Draft created from a template-based brief") ? 1 : 0);
-  add("placeholders", "facts", "No unfinished template notes",
-    placeholders ? "fail" : "pass",
-    placeholders ? `${placeholders} bracketed draft note(s) still in the text.` : "None left.");
+  const notes = findUnresolvedNotes(article);
+  checks.push({
+    id: "placeholders", group: "facts", kind: "automated", label: "No unfinished template notes",
+    state: notes.length ? "fail" : "pass",
+    detail: notes.length
+      ? `${notes.length} unresolved draft note${notes.length === 1 ? "" : "s"} — replace each with verified content or delete it:`
+      : "No draft notes, placeholders or editorial instructions left.",
+    // Listed individually so the editor can show and jump to each one.
+    items: notes,
+  });
 
   const lower = `${article.title} ${body}`.toLowerCase();
   const risky = RISKY_PHRASES.filter((p) => lower.includes(p));
@@ -193,10 +266,21 @@ export function evaluateArticle(article, ctx = {}) {
     cta ? "Links to a quote request or product page." : "Add a call to action — e.g. a link to request a quotation (/#contact) or to the relevant product.");
 
   // ── Human sign-offs ────────────────────────────────────────────────────
+  // A sign-off vouches for the text as it was when it was given. If the text
+  // changes afterwards — or the sign-off predates this fingerprint — it no
+  // longer counts and has to be given again.
   const review = article.review || {};
+  const fingerprint = contentFingerprint(article);
   for (const h of HUMAN_CHECKS) {
     const signed = review[h.id];
-    checks.push({ ...h, kind: "human", state: signed ? "pass" : "not_checked", detail: signed ? `Confirmed${signed.by ? ` by ${signed.by}` : ""}${signed.at ? ` on ${new Date(signed.at).toLocaleDateString()}` : ""}.` : "Needs a reviewer's confirmation." });
+    const current = signed && signed.hash === fingerprint;
+    const who = signed ? `${signed.by ? ` by ${signed.by}` : ""}${signed.at ? ` on ${new Date(signed.at).toLocaleDateString()}` : ""}` : "";
+    checks.push({
+      ...h, kind: "human",
+      state: current ? "pass" : "not_checked",
+      stale: !!signed && !current,
+      detail: current ? `Confirmed${who}.` : signed ? `Confirmed${who}, but the text has changed since — review it again.` : "Needs a reviewer's confirmation.",
+    });
   }
 
   const automated = checks.filter((c) => c.kind === "automated" && c.state !== "not_checked");

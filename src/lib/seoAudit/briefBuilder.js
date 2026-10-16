@@ -50,7 +50,10 @@ function queryVariations(query, { manufacturer, category }) {
 //           productIds, region, relatedArticleIds, sources, outcome }
 // catalog: { products, manufacturers, categories, articles }
 export function buildBrief(inputs, catalog) {
-  const query = (inputs.query || "").trim();
+  // A page title pasted as the query ("Rosemount 3095MFA Mass Flowmeter |
+  // Emerson | Trademarco") carries site-name segments nobody searches for —
+  // keep only the part before the first " | ".
+  const query = (inputs.query || "").split(/\s+\|\s+/)[0].trim();
   const manufacturer = catalog.manufacturers.find((m) => m.id === inputs.manufacturerId) || null;
   const category = catalog.categories.find((c) => c.id === inputs.categoryId) || null;
   const chosen = catalog.products.filter((p) => (inputs.productIds || []).includes(p.id));

@@ -10,7 +10,7 @@ import { uploadArticleImage } from "../../../lib/supabase/storage";
 import { renderMarkdown } from "../../../lib/markdown";
 import { ARTICLE_BODY_CSS } from "../../../lib/articlePresentation";
 import { articleMeta, TITLE_MAX, DESCRIPTION_MIN, DESCRIPTION_MAX } from "../../../lib/seoMeta";
-import { evaluateArticle, GROUPS } from "../../../lib/seoAudit/contentChecklist";
+import { evaluateArticle, contentFingerprint, GROUPS } from "../../../lib/seoAudit/contentChecklist";
 import { suggestArticleLinks, productUrl } from "../../../lib/seoAudit/linking";
 import { INTENTS } from "../../../lib/seoAudit/briefBuilder";
 import { slugify } from "../../../data/catalog/schema";
@@ -106,6 +106,22 @@ export default function ArticleEditor() {
     setForm((f) => ({ ...f, body_md: next }));
     requestAnimationFrame(() => { if (el) { el.focus(); el.selectionStart = el.selectionEnd = start + text.length; } });
   };
+  // Selects a body line in the editor, so a flagged note can be fixed in place.
+  const jumpToLine = (lineNumber) => {
+    setView("edit");
+    requestAnimationFrame(() => {
+      const el = textRef.current;
+      if (!el) return;
+      const lines = form.body_md.split("\n");
+      const start = lines.slice(0, lineNumber - 1).reduce((n, l) => n + l.length + 1, 0);
+      el.focus();
+      el.setSelectionRange(start, start + (lines[lineNumber - 1] ?? "").length);
+      // Scroll the selected line into view inside the textarea.
+      const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 20;
+      el.scrollTop = Math.max(0, (lineNumber - 3) * lineHeight);
+    });
+  };
+
   const wrap = (before, after = before, placeholder = "text") => {
     const el = textRef.current;
     const sel = el ? form.body_md.slice(el.selectionStart, el.selectionEnd) : "";
@@ -181,11 +197,13 @@ export default function ArticleEditor() {
     navigate("/admin/seo/content");
   };
 
-  const toggleSignOff = (checkId) => {
+  // A sign-off records the fingerprint of the text it was given for; editing
+  // the text afterwards invalidates it (see evaluateArticle).
+  const toggleSignOff = (checkId, isCurrent) => {
     setForm((f) => {
       const review = { ...f.review };
-      if (review[checkId]) delete review[checkId];
-      else review[checkId] = { by: email || "admin", at: new Date().toISOString() };
+      if (isCurrent) delete review[checkId];
+      else review[checkId] = { by: email || "admin", at: new Date().toISOString(), hash: contentFingerprint(f) };
       return { ...f, review };
     });
   };
@@ -318,9 +336,26 @@ export default function ArticleEditor() {
                       <StateBadge state={c.state} />
                     </div>
                     <div style={{ color: ADMIN_COLORS.medGray, fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{c.detail}</div>
+                    {c.items?.length > 0 && (
+                      <ul style={{ margin: "6px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 4 }}>
+                        {c.items.map((item, i) => (
+                          <li key={i} style={{ fontSize: 12, lineHeight: 1.4, background: ADMIN_COLORS.dangerBg, borderRadius: 4, padding: "5px 7px" }}>
+                            {item.line ? (
+                              <button type="button" onClick={() => jumpToLine(item.line)} style={{ all: "unset", cursor: "pointer", fontWeight: 700, color: ADMIN_COLORS.danger, marginRight: 6 }} title="Select this line in the editor">
+                                Line {item.line}
+                              </button>
+                            ) : (
+                              <strong style={{ color: ADMIN_COLORS.danger, marginRight: 6 }}>{item.where}</strong>
+                            )}
+                            <code style={{ fontSize: 11.5, wordBreak: "break-word" }}>{item.text.length > 90 ? `${item.text.slice(0, 90)}…` : item.text}</code>
+                            <div style={{ color: ADMIN_COLORS.medGray, fontSize: 11 }}>{item.reason}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                     {c.kind === "human" && (
                       <label style={{ display: "flex", gap: 6, alignItems: "center", marginTop: 4, fontSize: 12, cursor: "pointer" }}>
-                        <input type="checkbox" checked={!!form.review[c.id]} onChange={() => toggleSignOff(c.id)} /> I&rsquo;ve reviewed this
+                        <input type="checkbox" checked={c.state === "pass"} onChange={() => toggleSignOff(c.id, c.state === "pass")} /> {c.stale ? "Reviewed the current text" : <>I&rsquo;ve reviewed this</>}
                       </label>
                     )}
                   </div>

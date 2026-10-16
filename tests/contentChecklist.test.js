@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { evaluateArticle, extractPartNumberLike, HUMAN_CHECKS } from "../src/lib/seoAudit/contentChecklist.js";
+import { evaluateArticle, extractPartNumberLike, contentFingerprint, HUMAN_CHECKS } from "../src/lib/seoAudit/contentChecklist.js";
 import { buildBrief, briefToDraft } from "../src/lib/seoAudit/briefBuilder.js";
 
 const products = [{ id: "p1", status: "published", part_number: "8580", product_name: "Butterfly Valve", slug: "8580", manufacturer: { slug: "fisher", name: "Fisher" }, manufacturer_id: "m1", category_id: "c1" }];
@@ -12,8 +12,9 @@ const good = {
   meta_description: "How to choose a butterfly valve for process service: sizing, seat materials, actuation and what to send for a quotation.",
   body_md: "Butterfly valve selection starts with the process conditions.\n\n## Seat materials\n\nSee the [Fisher 8580](/manufacturers/fisher/8580) for an example.\n\n## Requesting a quote\n\n[Request a quotation](/#contact)",
   sources: [{ url: "https://www.emerson.com/8580" }],
-  review: Object.fromEntries(HUMAN_CHECKS.map((h) => [h.id, { by: "a", at: "2026-10-16" }])),
 };
+// Signed off on exactly this text.
+good.review = Object.fromEntries(HUMAN_CHECKS.map((h) => [h.id, { by: "a", at: "2026-10-16", hash: contentFingerprint(good) }]));
 const ctx = { articles: [good], products, manufacturers, categories };
 const state = (r, id) => r.checks.find((c) => c.id === id).state;
 
@@ -28,6 +29,15 @@ describe("evaluateArticle", () => {
     const r = evaluateArticle({ ...good, review: {} }, ctx);
     expect(r.canPublish).toBe(false);
     expect(r.checks.filter((c) => c.kind === "human").every((c) => c.state === "not_checked")).toBe(true);
+  });
+  it("invalidates sign-offs when the text changes after review, or predates the fingerprint", () => {
+    const edited = evaluateArticle({ ...good, body_md: `${good.body_md}\n\nA new paragraph nobody reviewed.` }, ctx);
+    expect(edited.canPublish).toBe(false);
+    const human = edited.checks.filter((c) => c.kind === "human");
+    expect(human.every((c) => c.state === "not_checked" && c.stale)).toBe(true);
+    expect(human[0].detail).toMatch(/text has changed since/);
+    const legacy = { ...good, review: Object.fromEntries(HUMAN_CHECKS.map((h) => [h.id, { by: "a", at: "2026-10-16" }])) };
+    expect(evaluateArticle(legacy, ctx).canPublish).toBe(false);
   });
   it("fails broken internal links, missing alt text and leftover template notes", () => {
     const r = evaluateArticle({ ...good, body_md: `${good.body_md}\n\n[x](/manufacturers/fisher/nope)\n\n![](/i.png)\n\n[Write this section. Cite sources.]` }, ctx);
